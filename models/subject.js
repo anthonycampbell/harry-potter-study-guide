@@ -6,7 +6,7 @@ var SubjectSchema = new Schema({
 });
 
 SubjectSchema.virtual('url').get(function(){
-    return '/subject/'+this._id;
+    return '/harry_potter_study_guide/subject/'+this._id;
 });
 
 module.exports = mongoose.model('Subject', SubjectSchema);

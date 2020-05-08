@@ -1,0 +1,14 @@
+extends layout
+block content
+    h1=title
+    ul
+        each field in subject.fields
+            li #{field}
+        else 
+            p= 'no fields'
+    ul
+        each entry in entries
+            each value in entry.values
+                li #{value}
+        else 
+            p='no entries'

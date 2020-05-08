@@ -39,7 +39,7 @@ function createEntry(subject, values, cb){
 }
 
 function createSubjects(cb){
-    async.parallel([
+    async.series([
         function(callback){
             createSubject("characters", ["name", "description"], callback);
         },
