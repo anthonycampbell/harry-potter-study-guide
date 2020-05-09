@@ -30,6 +30,7 @@ block content
             for (var i = 0; i < inputs.length; i++){
                 inputs[i].addEventListener('keydown', function(e){
                     if(e.keyCode === 13){
+                        e.preventDefault();
                         var tr = document.createElement("tr");
                         var td1 = document.createElement("td");
                         var td2 = document.createElement("td");
@@ -43,10 +44,6 @@ block content
                     }
                 });
             }
-        function isClicked(e){
-            e.preventDefault();
-            document.querySelector('input[type=submit]').addEventListener('click', function(e){
-                document.querySelector('form').submit();
-            });
-            return false;
-        }
+        document.querySelector('input[type=submit]').addEventListener('click', function(e){
+            document.querySelector('form').submit();
+        });
