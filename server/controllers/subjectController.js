@@ -7,7 +7,8 @@ exports.index = function(req, res, next){
         if (err){
             next(err);
         }
-        res.render('index', {title: 'Home', subjects: results});
+        //res.render('index', {title: 'Home', subjects: results});
+        res.json({title: 'Home', subjects: results});
     });
 }
 
