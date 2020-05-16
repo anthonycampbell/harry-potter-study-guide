@@ -1,52 +1,45 @@
 import Head from 'next/head'
-import React from 'react'
 import Link from 'next/link'
+import useSWR from 'swr'
+import React, {useState, useEffect} from 'react'
 
-class Subject extends React.Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            d: {}
-        };
-    }
-
-    fetchSubjects(){
-        fetch("http://localhost:3030/")
-            .then(response => response.json())
-            .then(data => this.setState({d: data}));
-    }
-
-    componentDidMount(){
-        this.fetchSubjects();
-    }
-
-    render(){
-        let subjects = this.state.d.subjects
-        let elements = []
-        if (subjects){
-            for (let i = 0; i < subjects.length; i++){
-                elements[i] = 
-                    <li key={subjects[i]._id}>
-                        <Link href='/subject/[id]' as={`/subject/${subjects[i]._id}`} >
-                            <a>{subjects[i].title}</a>
-                        </Link>
-                    </li>
-            }
+export default function Subject(){
+    const {data, error} = useSWR("http://localhost:3030/", fetcher)
+    if (error) return <div>Error loading page{error}</div>
+    if (!data) return <div>Loading ...</div>
+    let subjects = getSomething(data.subjects)
+    return(
+        <>
+            <Head>
+                <title>Subject</title>
+            </Head>
+            <div>
+                <h1>{data.title}</h1>
+                <ul>
+                    {subjects}
+                </ul>
+            </div>
+        </>
+    );    
+    async function fetcher(url){
+        try{
+            let res = await fetch(url)
+            let json = await res.json()
+            return json
+        } catch(error) {
+            console.error(error)
         }
-        return(
-            <>
-                <Head>
-                    <title>Subject</title>
-                </Head>
-                <div>
-                    <h1>{this.state.d.title}</h1>
-                    <ul>
-                        {elements}
-                    </ul>
-                </div>
-            </>
-        );
+    }
+    function getSsubjects(subjects){
+        let elements = []
+        for (let i = 0; i < subjects.length; i++){
+            elements[i] = 
+            <li key={subjects[i]._id}>
+                    <Link href='/subject/[id]' as={`/subject/${subjects[i]._id}`} >
+                        <a>{subjects[i].title}</a>
+                    </Link>
+                </li>
+        }
+        return elements
     }
 }
-
-export default Subject
