@@ -21,51 +21,38 @@ export default function Subject(){
                 </ul>
             </div>
             <div className='newTable'>
-                <table>
-                    <tbody>
-                        <tr>
-                            <th>
-                                {
-                                    newFields.map((v,i)=>{
-                                            if (i == 0){ 
-                                                return <input type= 'text' placeholder='Enter Title' /> 
-                                            } 
-                                            return <input key={i} type='text' placeholder='Enter Field' />
-                                    })
-                                }
-                            </th>
-                        </tr>
-                    </tbody>
-                </table>
-                <button type='button' onClick={newTable}>
-                    {newFields.length < 1 ? 'New Table' : newFields.length < 2 ? 'Add Field' : 'Another Field'}
-                </button>
-                {/*<form onSubmit={onSubmit}>
-                    {
-                        newFields.map((v, i) => {
-                            return(
-                                <label key={i}>
-                                    <input type='number'
-                                        step='1'
-                                        min='0'
-                                        max='100' 
-                                        name='numFields' 
-                                        placeholder='Number of Fields' />
-                                </label>
-                            )
-                        })
-                    }
-                    <input type="submit" value="New Table"/>
-                </form>*/}
+            <form onSubmit={saveSubject}>
+                    <table>
+                        <tbody>
+                            {newFields.length > 0 &&
+                                    <tr><th><input type= 'text' placeholder='Enter Title' /></th></tr>
+                            } 
+                            <tr>
+                                {newFields.map((v,i)=>{
+                                    return (
+                                        <td key={i}><input type='text' placeholder='Enter Field' /></td>
+                                    )
+                                })}
+                                <td>
+                                    <button type='button' onClick={newTable}>
+                                        {newFields.length < 1 ? 
+                                            'New Table' : 'Another Field'}
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    {newFields.length > 0 && <input type='submit' value='Save New Table'/> }
+                </form>
             </div>
         </>
     );
+    function saveSubject(event){
+        event.preventDefault()
+        console.log(event.target)
+    }
     function newTable(){
         setNewFields(newFields => [...newFields, null])
-        //<input type='text' placeholder='Enter Title' />
-    }
-    function newField(){
-        <input type='text' placeholder='Enter Field' />
     }
     async function fetcher(url){
         try{
