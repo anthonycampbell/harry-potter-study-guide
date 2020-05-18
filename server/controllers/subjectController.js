@@ -1,3 +1,4 @@
+const validator = require('express-validator');
 var Subject = require('../models/subject.js');
 var Entry = require('../models/Entry');
 var async = require('async');
@@ -12,7 +13,11 @@ exports.index = function(req, res, next){
     });
 }
 
-exports.subject_detail = function(req, res, next){
+exports.subject_create = function(req, res, next){
+    res.json({subject: "create"});
+}
+
+exports.subject_detail_get = function(req, res, next){
     async.parallel({
         subject: function(callback){
             Subject.findById(req.params.id).exec(callback);
@@ -24,8 +29,19 @@ exports.subject_detail = function(req, res, next){
         if (err){
             next(err);
         }
-        console.log(results.entries);
-        res.render('subject_detail', {title: results.subject.title, subject: results.subject, entries: results.entries});
+        res.json({title: results.subject.title, subject: results.subject, entries: results.entries});
+        //res.render('subject_detail', {title: results.subject.title, subject: results.subject, entries: results.entries});
     });
 }
 
+exports.subject_detail_post = function (req, res, next) {
+    res.json({subject: "detail post"});
+    /*validator.body('name', 'name required').trim().isLength({min: 1}),
+    validator.sanitize('name').escape(),
+    (req, res, next) => {
+        const errors = validator.validationResult(req)
+        var entry = new Entry({
+            
+        })
+    }*/
+}

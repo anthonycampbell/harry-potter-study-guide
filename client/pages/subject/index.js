@@ -4,10 +4,11 @@ import useSWR from 'swr'
 import React, {useState, useEffect} from 'react'
 
 export default function Subject(){
+    const [newFields, setNewFields] = useState([])
     const {data, error} = useSWR("http://localhost:3030/", fetcher)
     if (error) return <div>Error loading page{error}</div>
     if (!data) return <div>Loading ...</div>
-    let subjects = getSomething(data.subjects)
+    let subjects = getSubjects(data.subjects)
     return(
         <>
             <Head>
@@ -19,8 +20,53 @@ export default function Subject(){
                     {subjects}
                 </ul>
             </div>
+            <div className='newTable'>
+                <table>
+                    <tbody>
+                        <tr>
+                            <th>
+                                {
+                                    newFields.map((v,i)=>{
+                                            if (i == 0){ 
+                                                return <input type= 'text' placeholder='Enter Title' /> 
+                                            } 
+                                            return <input key={i} type='text' placeholder='Enter Field' />
+                                    })
+                                }
+                            </th>
+                        </tr>
+                    </tbody>
+                </table>
+                <button type='button' onClick={newTable}>
+                    {newFields.length < 1 ? 'New Table' : newFields.length < 2 ? 'Add Field' : 'Another Field'}
+                </button>
+                {/*<form onSubmit={onSubmit}>
+                    {
+                        newFields.map((v, i) => {
+                            return(
+                                <label key={i}>
+                                    <input type='number'
+                                        step='1'
+                                        min='0'
+                                        max='100' 
+                                        name='numFields' 
+                                        placeholder='Number of Fields' />
+                                </label>
+                            )
+                        })
+                    }
+                    <input type="submit" value="New Table"/>
+                </form>*/}
+            </div>
         </>
-    );    
+    );
+    function newTable(){
+        setNewFields(newFields => [...newFields, null])
+        //<input type='text' placeholder='Enter Title' />
+    }
+    function newField(){
+        <input type='text' placeholder='Enter Field' />
+    }
     async function fetcher(url){
         try{
             let res = await fetch(url)
@@ -30,7 +76,7 @@ export default function Subject(){
             console.error(error)
         }
     }
-    function getSsubjects(subjects){
+    function getSubjects(subjects){
         let elements = []
         for (let i = 0; i < subjects.length; i++){
             elements[i] = 
