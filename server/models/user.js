@@ -1,0 +1,13 @@
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+var UserSchema = new Schema({
+    username: {type: String, required: true},
+    email: {type: String, required: true},
+    password: {type: String, required: true, min:8},
+    date: {type: String, default: Date.now},
+    subjects: [{type: Schema.Types.ObjectId, ref: 'Subject'}],
+    friends: [{type: Schema.Types.ObjectId, ref: 'User'}]
+});
+
+module.exports = mongoose.model('User', UserSchema);
