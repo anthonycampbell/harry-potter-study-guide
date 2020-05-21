@@ -1,12 +1,13 @@
 const validator = require('express-validator');
-var User = require('../models/user')
+const bcrypt = require('bcryptjs');
+var User = require('../models/user');
 
 
-exports.register = function(req, res, next){
+exports.register = [
     //validate 
     validator.body('username', 'username must be between 6 and 30 characters')
         .trim()
-        .isLength({min:6, max:30}),
+        .isLength({min:1, max:30}),
     validator.body('email')
         .trim()
         .isLength({min:1})
@@ -15,7 +16,7 @@ exports.register = function(req, res, next){
         .withMessage('email must be valid'),
     validator.body('password', 'password must be between 6 and 30 characters')
         .trim()
-        .isLength({min:6, max:30}),
+        .isLength({min:1, max:30}),
     
     //sanitize
     validator.sanitizeBody('*').escape(),
@@ -23,11 +24,11 @@ exports.register = function(req, res, next){
 
     //process request
     (req, res, next) => {
-        const errors = validationResult(req);
+        const errors = validator.validationResult(req);
         if (!errors.isEmpty()){
             return res.status(400).json(errors);
         }
-        User.findOne(req.body.email).exec( (err, found_email) => {
+        User.findOne({email: req.body.email}).exec( (err, found_email) => {
             if (err) {
                 return next(err);
             }
@@ -52,4 +53,4 @@ exports.register = function(req, res, next){
             });
         });
     }
-}
+]
