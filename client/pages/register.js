@@ -1,15 +1,15 @@
-import Link from 'next/link'
+import Head from 'next/head'
 import React from 'react'
 import { useState } from 'react'
 
-function Login(){
+function Register(){
   const [input, setInput] = useState({})
   function handleChange(e){
     setInput({...input, [e.target.name]: e.target.value})
   }
   function handleSubmit(event){
     event.preventDefault()
-    fetch('http://localhost:3030/login', {
+    fetch('http://localhost:3030/register', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -24,8 +24,11 @@ function Login(){
   return(
     <>
       <div>
-        <h1>Login</h1>
+        <h1>Register</h1>
         <form onSubmit={handleSubmit}>
+          <label>username:
+            <input type='text' name='username' onChange={handleChange} />
+          </label>
           <label>email:
             <input type='text' name='email' onChange={handleChange} />
           </label>
@@ -34,10 +37,9 @@ function Login(){
           </label>
           <input type="submit" value='submit' />
         </form>
-        <Link href="/register"><a>Register Here</a></Link>
       </div>
     </>
   );
 }
 
-export default Login 
+export default Register 

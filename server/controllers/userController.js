@@ -5,7 +5,7 @@ var User = require('../models/user');
 
 exports.register = [
     //validate 
-    validator.body('username', 'username must be between 6 and 30 characters')
+    validator.body('username', 'username must be between 1 and 30 characters')
         .trim()
         .isLength({min:1, max:30}),
     validator.body('email')
@@ -14,7 +14,7 @@ exports.register = [
         .withMessage('email is required')
         .isEmail()
         .withMessage('email must be valid'),
-    validator.body('password', 'password must be between 6 and 30 characters')
+    validator.body('password', 'password must be between 1 and 30 characters')
         .trim()
         .isLength({min:1, max:30}),
     
@@ -52,5 +52,25 @@ exports.register = [
                 });
             });
         });
+    }
+]
+
+exports.login = [
+    //validate
+    validator.body('email')
+        .trim()
+        .isLength({min:1})
+        .withMessage('email is required')
+        .isEmail()
+        .withMessage('email must be valid'),
+    validator.body('password', 'password must be between 1 and 30 characters')
+        .trim()
+        .isLength({min:1, max:30}),
+    //sanitize
+    validator.sanitizeBody('*').escape(),
+    validator.sanitizeBody('email').normalizeEmail(),
+    //process request
+    (req, res, next) => {
+        res.json({bam: 'boo'});
     }
 ]
