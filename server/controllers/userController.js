@@ -1,5 +1,6 @@
 const validator = require('express-validator');
 const bcrypt = require('bcryptjs');
+const jwt = require("jsonwebtoken");
 var User = require('../models/user');
 
 
@@ -71,6 +72,34 @@ exports.login = [
     validator.sanitizeBody('email').normalizeEmail(),
     //process request
     (req, res, next) => {
-        res.json({bam: 'boo'});
+        const errors = validator.validationResult(req);
+        if (!errors.isEmpty()){
+            return res.status(400).json(errors);
+        }
+        const email = req.body.email;
+        const password = req.body.password;
+        User.findOne({email}).exec( (err, user) => {
+            if (err){
+                console.log('OOOOOOOOOOOOOOOOPPPPPSSS');
+                next(err);
+            }
+            bcrypt.compare(password, user.password, (err, isMatch) => {
+                console.log(isMatch);
+                if (isMatch){
+                    const payload = {id: user.id};
+                    jwt.sign(payload,
+                            'secret', 
+                            { expiresIn: 31556926 }, // a year
+                            (err, token) => {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                res.json({success: true, token: "Bearer" + token});
+                            });
+                } else {
+                    return res.status(400).json({passwordIncorrect: "Password incorrect"})
+                }
+            });
+        })
     }
 ]
