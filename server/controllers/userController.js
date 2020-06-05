@@ -6,18 +6,18 @@ var User = require('../models/user');
 
 exports.register = [
     //validate 
-    validator.body('username', 'username must be between 1 and 30 characters')
+    validator.body('username', 'username must be between 4 and 30 characters')
         .trim()
-        .isLength({min:1, max:30}),
+        .isLength({min:4, max:30}),
     validator.body('email')
         .trim()
         .isLength({min:1})
         .withMessage('email is required')
         .isEmail()
         .withMessage('email must be valid'),
-    validator.body('password', 'password must be between 1 and 30 characters')
+    validator.body('password', 'password must be between 4 and 30 characters')
         .trim()
-        .isLength({min:1, max:30}),
+        .isLength({min:4, max:30}),
     
     //sanitize
     validator.sanitizeBody('*').escape(),
@@ -64,9 +64,9 @@ exports.login = [
         .withMessage('email is required')
         .isEmail()
         .withMessage('email must be valid'),
-    validator.body('password', 'password must be between 1 and 30 characters')
+    validator.body('password', 'password must be between 4 and 30 characters')
         .trim()
-        .isLength({min:1, max:30}),
+        .isLength({min:4, max:30}),
     //sanitize
     validator.sanitizeBody('*').escape(),
     validator.sanitizeBody('email').normalizeEmail(),
@@ -80,11 +80,9 @@ exports.login = [
         const password = req.body.password;
         User.findOne({email}).exec( (err, user) => {
             if (err){
-                console.log('OOOOOOOOOOOOOOOOPPPPPSSS');
                 next(err);
             }
             bcrypt.compare(password, user.password, (err, isMatch) => {
-                console.log(isMatch);
                 if (isMatch){
                     const payload = {id: user.id};
                     jwt.sign(payload,
