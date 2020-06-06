@@ -5,7 +5,7 @@ import React, {useState, useEffect} from 'react'
 
 export default function Subject(){
     const [newFields, setNewFields] = useState([])
-    const {data, error} = useSWR("http://localhost:3030/", fetcher)
+    const {data, error} = useSWR("http://localhost:3030/harry_potter_study_guide", fetcher)
     if (error) return <div>Error loading page{error}</div>
     if (!data) return <div>Loading ...</div>
     let subjects = getSubjects(data.subjects)
