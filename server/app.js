@@ -24,7 +24,11 @@ app.set('view engine', 'pug');
 
 app.use(passport.initialize());
 require('./config/passport')(passport);
-app.use(cors());
+var corsOpts = {
+  origin: 'http://localhost:3000',
+  credentials: true
+}
+app.use(cors(corsOpts));
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

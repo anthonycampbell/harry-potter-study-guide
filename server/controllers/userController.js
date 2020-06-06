@@ -92,6 +92,7 @@ exports.login = [
                                 if (err) {
                                     console.log(err);
                                 }
+                                res.cookie('token', token, {httpOnly: true});
                                 res.json({success: true, token: "Bearer" + token});
                             });
                 } else {
