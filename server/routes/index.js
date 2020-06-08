@@ -1,9 +1,12 @@
 var express = require('express');
 var router = express.Router();
 var user_controller = require('../controllers/userController');
+var passport = require('passport');
 
 /* GET home page. */
 router.post('/register', user_controller.register);
 router.post('/login', user_controller.login);
+router.post('/logout', passport.authenticate('jwt', {session: false}), user_controller.logout);
+
 
 module.exports = router;

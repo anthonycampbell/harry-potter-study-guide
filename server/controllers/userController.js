@@ -92,8 +92,8 @@ exports.login = [
                                 if (err) {
                                     console.log(err);
                                 }
-                                res.cookie('token', token, {httpOnly: true});
-                                res.json({success: true, token: "Bearer" + token});
+                                res.cookie('jwt', token, {httpOnly: true});
+                                res.json({success: true, token: "JWT " + token});
                             });
                 } else {
                     return res.status(400).json({passwordIncorrect: "Password incorrect"})
@@ -102,3 +102,8 @@ exports.login = [
         })
     }
 ]
+
+exports.logout = function(req, res, next){
+    res.clearCookie('jwt', {httpOnly: true});
+    res.send('cookie cleared');
+}

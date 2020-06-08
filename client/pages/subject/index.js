@@ -45,8 +45,25 @@ export default function Subject(){
                     {newFields.length > 0 && <input type='submit' value='Save New Table'/> }
                 </form>
             </div>
+            <form onSubmit={logout}>
+                <input type='submit' value = 'Logout'/>
+            </form>
         </>
     );
+
+    async function logout(event){
+        event.preventDefault()
+        try{
+            let res = await fetch('http://localhost:3030/logout', {
+                method: 'POST',
+                credentials: 'include'
+              })
+            let json = await res.text()
+            console.log(json)
+        } catch(error) {
+            console.error(error)
+        }
+    }
     function saveSubject(event){
         event.preventDefault()
         console.log(event.target)
@@ -56,7 +73,9 @@ export default function Subject(){
     }
     async function fetcher(url){
         try{
-            let res = await fetch(url)
+            let res = await fetch(url, {
+                credentials: 'include'
+              })
             let json = await res.json()
             return json
         } catch(error) {
