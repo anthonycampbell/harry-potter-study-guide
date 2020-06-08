@@ -17,7 +17,7 @@ module.exports = passport => {
                 return done(err, false);
             }
             if (user){
-                return done(null, user)
+                return done(null, user);
             }
             //user doesnt exist
             return done(null, false);

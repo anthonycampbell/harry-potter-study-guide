@@ -1,9 +1,15 @@
 import Link from 'next/link'
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-function Login(){
+function Login({isLoggedIn}){
   const [input, setInput] = useState({})
+  console.log(isLoggedIn)
+  if (isLoggedIn === 'true'){
+    console.log('logged in')
+  } else {
+    console.log('logged out')
+  }
   function handleChange(e){
     setInput({...input, [e.target.name]: e.target.value})
   }
@@ -39,6 +45,21 @@ function Login(){
       </div>
     </>
   );
+}
+
+
+Login.getInitialProps = async (ctx) => {
+  let isLoggedIn
+  try{
+    let res = await fetch('http://localhost:3030/verify', {
+      credentials: 'include',
+      headers: ctx.req ? {cookie: ctx.req.headers.cookie} : undefined
+    })
+    isLoggedIn = await res.text()
+  } catch(error) {
+    console.error(error)
+  }
+  return { isLoggedIn: isLoggedIn }
 }
 
 export default Login 

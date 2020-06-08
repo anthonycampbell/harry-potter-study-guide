@@ -2,7 +2,7 @@ const validator = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 var User = require('../models/user');
-
+var passport = require('passport');
 
 exports.register = [
     //validate 
@@ -106,4 +106,16 @@ exports.login = [
 exports.logout = function(req, res, next){
     res.clearCookie('jwt', {httpOnly: true});
     res.send('cookie cleared');
+}
+
+exports.verify = function(req, res, next){
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        if(err){ return next(err); }
+        console.log(user + 'wow');
+        if (!user){ return res.send(false); }
+        req.login(user, {session: false},  function(err){
+            if (err){ return next(err); }
+            return res.send(true);
+        });
+    })(req, res, next);
 }
