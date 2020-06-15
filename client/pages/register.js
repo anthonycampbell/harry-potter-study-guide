@@ -1,8 +1,12 @@
 import React from 'react'
 import { useState } from 'react'
+import { parse } from 'cookie'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
 
 function Register(){
   const [input, setInput] = useState({})
+  const router = useRouter()
   function handleChange(e){
     setInput({...input, [e.target.name]: e.target.value})
   }
@@ -18,7 +22,7 @@ function Register(){
     })
       .then(res => res.text())
       .catch(err => console.error(err))
-      .then(data => console.log(data))
+      .then(data => router.push('/login'))
   }
   return(
     <>
@@ -36,9 +40,22 @@ function Register(){
           </label>
           <input type="submit" value='submit' />
         </form>
+        <Link href='/login'><a>Login</a></Link>
       </div>
     </>
   );
+}
+
+export async function getServerSideProps(ctx){
+  const cookies = ctx.req.headers.cookie
+  const parsedCookies = parse(cookies || '')
+  const jwtCookie = Boolean(parsedCookies['jwt'])
+  if (jwtCookie){
+    typeof window !== 'undefined'
+      ? Router.push('/')
+      : ctx.res.writeHead(302, { Location: '/' }).end()
+  }
+  return { props: { } }
 }
 
 export default Register 

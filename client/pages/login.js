@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import { parse } from 'cookie'
+
 function Login(){
     const [input, setInput] = useState({})
     const router = useRouter()
@@ -23,7 +25,7 @@ function Login(){
         .then(res => res.text())
         .catch(err => console.error(err))
         .then(data => {
-            router.push(router.pathname)
+            router.push('/')
         })
     }
     return(
@@ -42,5 +44,17 @@ function Login(){
         </div>
     );
 }
+
+export async function getServerSideProps(ctx){
+    const cookies = ctx.req.headers.cookie
+    const parsedCookies = parse(cookies || '')
+    const jwtCookie = Boolean(parsedCookies['jwt'])
+    if (jwtCookie){
+      typeof window !== 'undefined'
+        ? Router.push('/')
+        : ctx.res.writeHead(302, { Location: '/' }).end()
+    }
+    return { props: { } }
+  }
 
 export default Login
