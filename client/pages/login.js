@@ -2,6 +2,7 @@ import { useState, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { parse } from 'cookie'
+import { auth } from '../components/authenticate'
 
 function Login(){
     const [input, setInput] = useState({})
@@ -46,15 +47,7 @@ function Login(){
 }
 
 export async function getServerSideProps(ctx){
-    const cookies = ctx.req.headers.cookie
-    const parsedCookies = parse(cookies || '')
-    const jwtCookie = Boolean(parsedCookies['jwt'])
-    if (jwtCookie){
-      typeof window !== 'undefined'
-        ? Router.push('/')
-        : ctx.res.writeHead(302, { Location: '/' }).end()
-    }
-    return { props: { } }
-  }
+    return auth(ctx, '/')
+}
 
 export default Login

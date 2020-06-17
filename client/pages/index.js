@@ -1,6 +1,6 @@
-import { parse } from 'cookie'
 import Logout from '../components/logout'
 import Link from 'next/link'
+import { auth } from '../components/authenticate'
 
 export default function Index(){
   return(
@@ -12,16 +12,8 @@ export default function Index(){
   );
 }
 
-export async function getServerSideProps(ctx){
-  const cookies = ctx.req.headers.cookie
-  const parsedCookies = parse(cookies || '')
-  const jwtCookie = Boolean(parsedCookies['jwt'])
-  if (!jwtCookie){
-    typeof window !== 'undefined'
-      ? Router.push('/login')
-      : ctx.res.writeHead(302, { Location: '/login' }).end()
-  }
-  return { props: { } }
+export async function getServerSideProps(ctx){ 
+  return auth(ctx, '/login') 
 }
 
 /*export const getServerSideProps = async (ctx) => {
