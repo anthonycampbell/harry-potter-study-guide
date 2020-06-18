@@ -10,7 +10,7 @@ export default function Logout(){
                 credentials: 'include'
               })
             let json = await res.text()
-            router.push('/')
+            router.push('/login')
         } catch(error) {
             console.error(error)
         }

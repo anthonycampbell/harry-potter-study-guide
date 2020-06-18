@@ -1,19 +1,23 @@
-import Head from 'next/head'
-import Link from 'next/link'
-import useSWR from 'swr'
 import React, {useState, useEffect} from 'react'
+import Logout from '../../components/logout'
+import NewSubject, { formatSubjects } from '../../components/newSubject'
+import { auth } from '../../components/authenticate'
 
-export default function Subject(){
+export default function Subject({ data }){
     const [newFields, setNewFields] = useState([])
-    const {data, error} = useSWR("http://localhost:3030/harry_potter_study_guide", fetcher)
-    if (error) return <div>Error loading page{error}</div>
-    if (!data) return <div>Loading ...</div>
-    let subjects = getSubjects(data.subjects)
+    let subjects = formatSubjects(data.subjects)
+
+    function saveSubject(event){
+        event.preventDefault()
+        console.log(event.target)
+    }
+    
+    function newTable(){
+        setNewFields(newFields => [...newFields, null])
+    }
+
     return(
         <>
-            <Head>
-                <title>Subject</title>
-            </Head>
             <div>
                 <h1>{data.title}</h1>
                 <ul>
@@ -21,77 +25,26 @@ export default function Subject(){
                 </ul>
             </div>
             <div className='newTable'>
-            <form onSubmit={saveSubject}>
-                    <table>
-                        <tbody>
-                            {newFields.length > 0 &&
-                                    <tr><th><input type= 'text' placeholder='Enter Title' /></th></tr>
-                            } 
-                            <tr>
-                                {newFields.map((v,i)=>{
-                                    return (
-                                        <td key={i}><input type='text' placeholder='Enter Field' /></td>
-                                    )
-                                })}
-                                <td>
-                                    <button type='button' onClick={newTable}>
-                                        {newFields.length < 1 ? 
-                                            'New Table' : 'Another Field'}
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    {newFields.length > 0 && <input type='submit' value='Save New Table'/> }
-                </form>
+                <NewSubject saveSubject={saveSubject} 
+                            newFields={newFields} 
+                            newTable={newTable} />
             </div>
-            <form onSubmit={logout}>
-                <input type='submit' value = 'Logout'/>
-            </form>
+            <Logout />
         </>
     );
+}
 
-    async function logout(event){
-        event.preventDefault()
-        try{
-            let res = await fetch('http://localhost:3030/logout', {
-                method: 'POST',
-                credentials: 'include'
-              })
-            let json = await res.text()
-            console.log(json)
-        } catch(error) {
-            console.error(error)
-        }
+export async function getServerSideProps(ctx){
+    auth(ctx, '/login')
+    let data
+    try{
+        let res = await fetch('http://localhost:3030/harry_potter_study_guide', {
+            credentials: 'include',
+            headers: ctx.req ? {cookie: ctx.req.headers.cookie} : undefined
+          })
+        data = await res.json()
+    } catch(error) {
+        console.error(error)
     }
-    function saveSubject(event){
-        event.preventDefault()
-        console.log(event.target)
-    }
-    function newTable(){
-        setNewFields(newFields => [...newFields, null])
-    }
-    async function fetcher(url){
-        try{
-            let res = await fetch(url, {
-                credentials: 'include'
-              })
-            let json = await res.json()
-            return json
-        } catch(error) {
-            console.error(error)
-        }
-    }
-    function getSubjects(subjects){
-        let elements = []
-        for (let i = 0; i < subjects.length; i++){
-            elements[i] = 
-            <li key={subjects[i]._id}>
-                    <Link href='/subject/[id]' as={`/subject/${subjects[i]._id}`} >
-                        <a>{subjects[i].title}</a>
-                    </Link>
-                </li>
-        }
-        return elements
-    }
+    return { props: {data: data}}
 }

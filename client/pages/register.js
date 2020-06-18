@@ -1,11 +1,10 @@
 import React from 'react'
 import { useState } from 'react'
-import { parse } from 'cookie'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { auth } from '../components/authenticate'
 
-function Register(){
+export default function Register(){
   const [input, setInput] = useState({})
   const router = useRouter()
   function handleChange(e){
@@ -50,5 +49,3 @@ function Register(){
 export async function getServerSideProps(ctx){
   return auth(ctx, '/')
 }
-
-export default Register 

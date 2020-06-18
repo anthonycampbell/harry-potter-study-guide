@@ -111,7 +111,6 @@ exports.logout = function(req, res, next){
 exports.verify = function(req, res, next){
     passport.authenticate('jwt', {session: false}, function(err, user, info){
         if(err){ return next(err); }
-        console.log(user + 'wow');
         if (!user){ return res.send(false); }
         req.login(user, {session: false},  function(err){
             if (err){ return next(err); }

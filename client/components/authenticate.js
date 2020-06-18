@@ -1,4 +1,5 @@
 import { parse } from 'cookie'
+import { Router } from 'next/router'
 
 export function auth(ctx, location){
   const cookies = ctx.req.headers.cookie
@@ -9,9 +10,7 @@ export function auth(ctx, location){
     typeof window !== 'undefined'
       ? Router.push(location)
       : ctx.res.writeHead(302, { Location: location }).end()  
-  } 
-  if (isLoggedIn && (path == '/login' || path == '/register')){
-    console.log(path + ' 2')
+  } else if(isLoggedIn && (path == '/login' || path == '/register')){
     typeof window !== 'undefined'
       ? Router.push(location)
       : ctx.res.writeHead(302, { Location: location }).end()
