@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react'
+import React, { useState } from 'react'
 import Logout from '../../components/logout'
 import NewSubject, { formatSubjects } from '../../components/newSubject'
-import { auth } from '../../components/authenticate'
+import { auth } from '../../utils/authenticate'
 
 export default function Subject({ data }){
     const [newFields, setNewFields] = useState([])
@@ -16,7 +16,7 @@ export default function Subject({ data }){
         setNewFields(newFields => [...newFields, null])
     }
 
-    return(
+   return (
         <>
             <div>
                 <h1>{data.title}</h1>
@@ -31,11 +31,12 @@ export default function Subject({ data }){
             </div>
             <Logout />
         </>
-    );
+    
+   );
 }
 
 export async function getServerSideProps(ctx){
-    auth(ctx, '/login')
+    auth(ctx, '/subject/index', '/login')
     let data
     try{
         let res = await fetch('http://localhost:3030/harry_potter_study_guide', {
@@ -47,4 +48,4 @@ export async function getServerSideProps(ctx){
         console.error(error)
     }
     return { props: {data: data}}
-}
+  }

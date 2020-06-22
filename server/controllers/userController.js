@@ -93,7 +93,7 @@ exports.login = [
                                     console.log(err);
                                 }
                                 res.cookie('jwt', token, {httpOnly: true});
-                                res.json({success: true, token: "JWT " + token});
+                                res.json({success: true, 'jwt': token});
                             });
                 } else {
                     return res.status(400).json({passwordIncorrect: "Password incorrect"})
@@ -111,10 +111,10 @@ exports.logout = function(req, res, next){
 exports.verify = function(req, res, next){
     passport.authenticate('jwt', {session: false}, function(err, user, info){
         if(err){ return next(err); }
-        if (!user){ return res.send(false); }
+        if (!user){ return res.send({'isLoggedIn': false}); }
         req.login(user, {session: false},  function(err){
             if (err){ return next(err); }
-            return res.send(true);
+            return res.json({'isLoggedIn': true});
         });
     })(req, res, next);
 }

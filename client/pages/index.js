@@ -1,31 +1,18 @@
 import Logout from '../components/logout'
 import Link from 'next/link'
-import { auth } from '../components/authenticate'
+import { auth } from '../utils/authenticate'
 
 export default function Index(){
-  return(
+  return (
     <>
-        <h1>You are logged in!</h1>
-        <Link href='/subject'><a>Subjects</a></Link>
-        <Logout />
+      <h1>You are logged in!</h1>
+      <Link href='/subject'><a>Subjects</a></Link>
+      <Logout />
     </>
   );
 }
 
-export async function getServerSideProps(ctx){ 
-  return auth(ctx, '/login') 
+export function getServerSideProps(ctx){
+  auth(ctx, '/', '/login')
+  return { props: { } }
 }
-
-/*export const getServerSideProps = async (ctx) => {
-  let isLoggedIn
-  try{
-    let res = await fetch('http://localhost:3030/verify', {
-      credentials: 'include',
-      headers: ctx.req ? {cookie: ctx.req.headers.cookie} : undefined
-    })
-    isLoggedIn = await res.text()
-  } catch(error) {
-    console.error(error)
-  }
-  return { props: {isLoggedIn: isLoggedIn }}
-}*/

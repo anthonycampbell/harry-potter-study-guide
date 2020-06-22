@@ -1,15 +1,16 @@
-import React from 'react'
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { auth } from '../components/authenticate'
+import { auth } from '../utils/authenticate'
 
 export default function Register(){
   const [input, setInput] = useState({})
   const router = useRouter()
+  
   function handleChange(e){
     setInput({...input, [e.target.name]: e.target.value})
   }
+
   function handleSubmit(event){
     event.preventDefault()
     fetch('http://localhost:3030/register', {
@@ -24,7 +25,7 @@ export default function Register(){
       .catch(err => console.error(err))
       .then(data => router.push('/login'))
   }
-  return(
+  return(  
     <>
       <div>
         <h1>Register</h1>
@@ -46,6 +47,7 @@ export default function Register(){
   );
 }
 
-export async function getServerSideProps(ctx){
-  return auth(ctx, '/')
+export function getServerSideProps(ctx){
+  auth(ctx, '/register', '/')
+  return { props: { } }
 }

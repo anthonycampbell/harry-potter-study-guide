@@ -1,12 +1,11 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import { auth } from '../components/authenticate'
+import { auth } from '../utils/authenticate'
 
 export default function Login(){
     const [input, setInput] = useState({})
     const router = useRouter()
-
     function handleChange(e){
         setInput({...input, [e.target.name]: e.target.value})
     }
@@ -22,11 +21,13 @@ export default function Login(){
             credentials: 'include',
             body: JSON.stringify(input)
         })
-        .then(res => res.text())
+        .then(res => res.json())
         .catch(err => console.error(err))
-        .then(data => router.push('/') )
+        .then(data => {
+            router.push('/') 
+        })
     }
-    return(
+    return ( 
         <div>
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
@@ -40,9 +41,11 @@ export default function Login(){
             </form>
             <Link href="/register"><a>Register Here</a></Link>
         </div>
+
     );
 }
 
-export async function getServerSideProps(ctx){
-    return auth(ctx, '/')
+export function getServerSideProps(ctx){
+    auth(ctx, '/login', '/')
+    return { props: { } }
 }

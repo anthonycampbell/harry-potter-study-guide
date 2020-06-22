@@ -10,6 +10,7 @@ export default function Logout(){
                 credentials: 'include'
               })
             let json = await res.text()
+            localStorage.removeItem('jwt')
             router.push('/login')
         } catch(error) {
             console.error(error)

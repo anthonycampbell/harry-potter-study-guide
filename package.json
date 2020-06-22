@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-	"dev": "concurrently \"cd server && npm run serverstart\" \"cd client && npm run dev\" "
+    "dev": "concurrently \"cd server && npm run serverstart\" \"cd client && npm run dev\" "
   },
   "repository": {
     "type": "git",
@@ -19,5 +19,6 @@
   "homepage": "https://github.com/anthonycampbell/joy#readme",
   "devDependencies": {
     "concurrently": "^5.2.0"
-  }
+  },
+  "dependencies": {}
 }
