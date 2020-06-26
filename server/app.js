@@ -5,13 +5,13 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var passport = require('passport');
-
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var harryPotterStudyGuideRouter = require('./routes/harry_potter_study_guide');
-
+var io = require('socket.io')();
 var app = express();
 
+// Socket.io
+app.io = io;
+
+// mongoose
 var mongoose = require('mongoose');
 var mongoDB = 'mongodb+srv://anthony:ArchieComics9@cluster0-hh67p.azure.mongodb.net/harry_potter?retryWrites=true&w=majority';
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -22,22 +22,34 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+// passport
 app.use(passport.initialize());
 require('./config/passport')(passport);
+
+// cors
 var corsOpts = {
   origin: 'http://localhost:3000',
   credentials: true
 }
 app.use(cors(corsOpts));
+
+//
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+// routes
+var indexRouter = require('./routes/index');
+var usersRouter = require('./routes/users');
+var harryPotterStudyGuideRouter = require('./routes/harry_potter_study_guide');
+var chatRouter = require('./routes/chat')(io);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/harry_potter_study_guide', harryPotterStudyGuideRouter);
+app.use('/chat', chatRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

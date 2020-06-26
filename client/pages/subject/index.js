@@ -47,5 +47,5 @@ export async function getServerSideProps(ctx){
     } catch(error) {
         console.error(error)
     }
-    return { props: {data: data}}
+    return { props: { data: data } }
   }

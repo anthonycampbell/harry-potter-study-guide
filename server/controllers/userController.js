@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 var User = require('../models/user');
 var passport = require('passport');
+var async = require('async');
 
 exports.register = [
     //validate 
@@ -108,7 +109,48 @@ exports.logout = function(req, res, next){
     res.send('cookie cleared');
 }
 
-exports.verify = function(req, res, next){
+exports.friends_get = function(req, res, next){
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        let friends = [];
+        if (err) { return next(err) }
+        if (!user) { return res.send({status: 'Logged out'}) }
+        async.map(user.friends, function(friend, done){
+            User.findById( friend ).exec(done);
+        }, function (err, results){
+            for (let i = 0; i < results.length; i++){
+                friends.push(results[i].username);
+            }
+            res.json({friends: friends});
+        }); 
+    })(req, res, next);
+} 
+
+exports.friends_post = function(req, res, next){
+    //validate
+    //sanitize
+    //process
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        if (err) { return next(err) }
+        if (!user) { return res.send({status: 'Logged out'}) }
+        User.findOne({ email: req.body.friend}).exec(function(err, friend){
+            console.log(friend.id)
+            if (err){return next(err)}
+            if (!friend) { return res.send('they dont exist')} 
+            if (user.friends.includes( req.body.friend )){
+                return res.send('You already added this friend');
+            }
+            User.findByIdAndUpdate(user.id, 
+                                   {$push: {friends: friend.id}}, 
+                                   function(err, con){
+                                       if(err){ return next(err) } 
+                                       res.send('friend added');
+                                   });
+            
+        });
+    })(req, res, next);
+}
+
+/*exports.verify = function(req, res, next){
     passport.authenticate('jwt', {session: false}, function(err, user, info){
         if(err){ return next(err); }
         if (!user){ return res.send({'isLoggedIn': false}); }
@@ -116,5 +158,5 @@ exports.verify = function(req, res, next){
             if (err){ return next(err); }
             return res.json({'isLoggedIn': true});
         });
-    })(req, res, next);
-}
+    })(req, res, next); 
+}*/

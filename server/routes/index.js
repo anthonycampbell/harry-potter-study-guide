@@ -7,7 +7,9 @@ var passport = require('passport');
 router.post('/register', user_controller.register);
 router.post('/login', user_controller.login);
 router.post('/logout', passport.authenticate('jwt', {session: false}), user_controller.logout);
-router.get('/verify', user_controller.verify);
+router.get('/friends', user_controller.friends_get);
+router.post('/friends', user_controller.friends_post);
+//router.get('/verify', user_controller.verify);
 
 
 module.exports = router;

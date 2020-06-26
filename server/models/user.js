@@ -7,7 +7,8 @@ var UserSchema = new Schema({
     password: {type: String, required: true, min:8},
     date: {type: String, default: Date.now},
     subjects: [{type: Schema.Types.ObjectId, ref: 'Subject'}],
-    friends: [{type: Schema.Types.ObjectId, ref: 'User'}]
+    friends: [{type: Schema.Types.ObjectId, ref: 'User'}],
+    chats: [{type: Schema.Types.ObjectId, ref: 'Chat'}]
 });
 
 module.exports = mongoose.model('User', UserSchema);

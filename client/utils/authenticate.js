@@ -1,4 +1,3 @@
-  
 import { parse } from 'cookie'
 
 export function auth(ctx, path, location){
