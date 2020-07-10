@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useState } from 'react';
-export default function Friends({ friends }){
+export default function Friends({ friends, friendRequests }){
     const [input, setInput] = useState({})
 
     function handleChange(event){
@@ -9,7 +9,7 @@ export default function Friends({ friends }){
 
     async function addFriend(event){
         event.preventDefault()
-        fetch('http://localhost:3030/friends', {
+        fetch('http://localhost:3030/friendRequests', {
             method: 'POST',
             headers: { 
                 'Accept': 'application/json',
@@ -32,6 +32,9 @@ export default function Friends({ friends }){
                 <input type='submit' value='Add Friend'/>
             </form>
             { friends.map((v,i) => {
+                return <div key={i}>{v}</div>
+            }) }
+            { friendRequests.map((v,i) => {
                 return <div key={i}>{v}</div>
             }) }
         </>

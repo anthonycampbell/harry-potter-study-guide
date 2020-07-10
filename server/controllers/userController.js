@@ -2,6 +2,7 @@ const validator = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require("jsonwebtoken");
 var User = require('../models/user');
+var UserFriendship = require('../models/userFriendship');
 var passport = require('passport');
 var async = require('async');
 
@@ -146,6 +147,46 @@ exports.friends_post = function(req, res, next){
                                        res.send('friend added');
                                    });
             
+        });
+    })(req, res, next);
+}
+
+exports.send_friend_request = function(req, res, next){
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        if (err) { return next(err) }
+        if (!user) { return res.send({status: 'Logged out'}) }
+        User.findOne({ email: req.body.friend }).exec(function(err, friend){
+            console.log(friend);
+            if (err){return next(err)}
+            if (!friend){return res.send('they dont exist')}
+            var friendRequest = new UserFriendship({ requester: user.id,
+                                                     recipient: friend.id,
+                                                     status: 1 }); // 1 means request made
+            friendRequest.save(function(err){
+                if(err){ return next(err)}
+                console.log('request saved');
+                res.send('request sent ');
+            });
+        });
+    })(req, res, next);
+}
+
+exports.get_friend_requests = function(req, res, next){
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        let requests = []
+        if (err) { return next(err) } 
+        if (!user) { return res.send({status: 'Logged out'}) }
+        UserFriendship.find({ recipient: user.id }).exec(function(err, results){
+            if (err) {return next(err)}
+            if (!results) { console.log('no requests') }
+            async.map(results, function(item, done) {
+                User.findById(item.requester).exec(done)
+            }, function (err, things){
+                for (let i = 0; i < things.length; i++){
+                    requests.push(things[i].username);
+                }
+                res.json({requests: requests});
+            });
         });
     })(req, res, next);
 }
