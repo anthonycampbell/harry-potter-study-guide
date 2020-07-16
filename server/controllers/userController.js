@@ -5,6 +5,7 @@ var User = require('../models/user');
 var UserFriendship = require('../models/userFriendship');
 var passport = require('passport');
 var async = require('async');
+const user = require('../models/user');
 
 exports.register = [
     //validate 
@@ -176,18 +177,89 @@ exports.get_friend_requests = function(req, res, next){
         let requests = []
         if (err) { return next(err) } 
         if (!user) { return res.send({status: 'Logged out'}) }
-        UserFriendship.find({ recipient: user.id }).exec(function(err, results){
+        UserFriendship.find({ recipient: user.id, status: 1 }).exec(function(err, friendRequests){
             if (err) {return next(err)}
-            if (!results) { console.log('no requests') }
-            async.map(results, function(item, done) {
-                User.findById(item.requester).exec(done)
-            }, function (err, things){
-                for (let i = 0; i < things.length; i++){
-                    requests.push(things[i].username);
-                }
+            if (!friendRequests) { console.log('no requests') }
+            async.map(friendRequests, function(request, done) {
+                User.findById(request.requester).exec(done)
+            }, function (err, requesters){
+                for (let i = 0; i < requesters.length; i++){
+                    requests.push({
+                        'username': requesters[i].username,
+                        'id': requesters[i].id
+                    });
+                } 
                 res.json({requests: requests});
             });
         });
+    })(req, res, next);
+}
+
+exports.process_friend_request = function (req, res, next){
+    //validate
+    //sanitize
+    //process request
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        if (err) { return next(err)}
+        if (!user) { return send('not logged in')}
+        console.log(req.body.requester);
+        console.log(req.body.answer);
+        if (req.body.answer === 'Accept'){
+            async.series([
+                function(callback){
+                    //find requester and update friends
+                    User.findByIdAndUpdate(req.body.requester, 
+                        {$push: {friends: user.id}}, 
+                        function(err, con){
+                            if(err){ return next(err) }
+                            callback(null,null); 
+                        });
+                },
+                function(callback){
+                    //find recipiend and update friends
+                    User.findByIdAndUpdate(user.id, 
+                        {$push: {friends: req.body.requester}}, 
+                        function(err, con){
+                            if(err){ return next(err) } 
+                            //res.send('friend added');
+                            callback(null, null)
+                        });
+                },
+                function(callback){
+                    //find userfriendship and update status
+                    UserFriendship.find({requester: req.body.requester,recipient: user.id}).exec(
+                        function(err, request){
+                            if (err) { return next(err)}
+                            async.map(request, 
+                                function(r, done){
+                                    UserFriendship
+                                        .findByIdAndUpdate(r.id, {status: 2}, //accepted
+                                            function(err, con){
+                                                if(err){ return next(err) } 
+                                                callback(null, null)
+                                            });
+                                });
+                        });
+                }
+            ], function(err, results){
+                if (err) {return next(err)}
+                res.send('friend added');
+            });
+        } else if (req.body.answer === 'Decline'){
+            UserFriendship.find({requester: req.body.requester,recipient: user.id}).exec(
+                function(err, request){
+                    if (err) { return next(err)}
+                    async.map(request, 
+                        function(r, done){
+                            UserFriendship
+                                .findByIdAndUpdate(r.id, {status: 3}, //rejected
+                                    function(err, con){
+                                        if(err){ return next(err) } 
+                                        res.send('request denied');
+                                    });
+                        });
+                });
+        }
     })(req, res, next);
 }
 

@@ -11,6 +11,7 @@ router.get('/friends', user_controller.friends_get);
 router.post('/friends', user_controller.friends_post);
 router.get('/friendRequests', user_controller.get_friend_requests);
 router.post('/friendRequests', user_controller.send_friend_request);
+router.post('/processFriendRequest', user_controller.process_friend_request)
 //router.get('/verify', user_controller.verify);
 
 module.exports = router;

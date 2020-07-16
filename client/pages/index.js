@@ -39,5 +39,6 @@ export async function getServerSideProps(ctx){
   } catch(error) {
     console.error(error)
   }
+  console.log(friendRequests)
   return { props: {friendRequests: friendRequests, friends: friends } }
 }
