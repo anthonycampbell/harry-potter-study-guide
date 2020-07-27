@@ -24,8 +24,7 @@ export async function getServerSideProps(ctx){
       credentials: 'include',
       headers: ctx.req ? {cookie: ctx.req.headers.cookie} : undefined
     })
-    let json = await res.json()
-    friends = json.friends
+    friends = await res.json()
   } catch(error) {
     console.error(error)
   }
@@ -39,6 +38,5 @@ export async function getServerSideProps(ctx){
   } catch(error) {
     console.error(error)
   }
-  console.log(friendRequests)
   return { props: {friendRequests: friendRequests, friends: friends } }
 }

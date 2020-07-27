@@ -8,14 +8,25 @@ module.exports = function(io){
 
     io.on('connection', (socket) => {
         console.log('user connected to messages');
-        socket.emit('chat', { chat: 'route' });
-        socket.on('chat message', (data) => {
-            console.log(data);
+        //socket.emit('chat', { chat: 'route' });
+        socket.on('message', (data) => {
+            console.log('server' + data);
+            socket.emit('chat', data);
         });
     });
 
-    router.get('/', function(req, res){
-        res.send('messages');
+    router.post('/', function(req, res, next){
+        passport.authenticate('jwt', {session: false}, function(err, user, info){
+            Chat.find({participants: {$all: [user.id, req.body.friend], $size: 2} } )
+            .exec(function(err, chats){
+                let ret = [];
+                for(let i = 0; i< chats.length; i++){
+                    console.log(chats[0]);
+                    ret = chats[0].messages;
+                }
+                res.send(ret);
+            });
+        })(req, res, next);
     });
     
     return router;

@@ -113,16 +113,17 @@ exports.logout = function(req, res, next){
 
 exports.friends_get = function(req, res, next){
     passport.authenticate('jwt', {session: false}, function(err, user, info){
-        let friends = [];
+        let friends = {};
         if (err) { return next(err) }
         if (!user) { return res.send({status: 'Logged out'}) }
         async.map(user.friends, function(friend, done){
             User.findById( friend ).exec(done);
         }, function (err, results){
             for (let i = 0; i < results.length; i++){
-                friends.push(results[i].username);
+                friends[results[i].username] = results[i].id;
             }
-            res.json({friends: friends});
+            console.log(friends);
+            res.json(friends);
         }); 
     })(req, res, next);
 } 
