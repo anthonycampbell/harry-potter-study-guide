@@ -7,10 +7,13 @@ export function auth(ctx, path, location){
   if (!isLoggedIn && path !== '/login' && path !== '/register'){
     typeof window !== 'undefined'
       ? Router.push(location)
-      : ctx.res.writeHead(302, { Location: location }).end()  
+      : ctx.res.writeHead(302, { Location: location }).end()
+    return false  
   } else if(isLoggedIn && (path === '/login' || path === '/register')){
     typeof window !== 'undefined'
       ? Router.push(location)
       : ctx.res.writeHead(302, { Location: location }).end()
+    return false
   }
+  return true
 }

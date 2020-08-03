@@ -13,18 +13,21 @@ export default function Index({ friends, friendRequests }){
       <Logout />
     </>
   );
-}
+} 
 
 export async function getServerSideProps(ctx){
-  auth(ctx, '/', '/login')
-  let friends = null
+  if (!auth(ctx, '/', '/login')){
+    return { props: {}}
+  }
+  let friends = {}
   let friendRequests = []
   try{
     let res = await fetch('http://localhost:3030/friends', {
       credentials: 'include',
       headers: ctx.req ? {cookie: ctx.req.headers.cookie} : undefined
     })
-    friends = await res.json()
+    let json = await res.json()
+    friends = json.friends ? json.friends : {}
   } catch(error) {
     console.error(error)
   }
@@ -34,7 +37,7 @@ export async function getServerSideProps(ctx){
       headers: ctx.req ? {cookie: ctx.req.headers.cookie} : undefined
     })
     let json = await res.json()
-    friendRequests = json.requests
+    friendRequests = json.requests ? json.requests : [] 
   } catch(error) {
     console.error(error)
   }

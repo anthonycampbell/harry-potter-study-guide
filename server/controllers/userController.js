@@ -122,8 +122,7 @@ exports.friends_get = function(req, res, next){
             for (let i = 0; i < results.length; i++){
                 friends[results[i].username] = results[i].id;
             }
-            console.log(friends);
-            res.json(friends);
+            res.json({friends: friends});
         }); 
     })(req, res, next);
 } 

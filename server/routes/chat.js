@@ -5,10 +5,12 @@ module.exports = function(io){
     var Message = require('../models/message');
     var User = require('../models/user');
     var Chat = require ('../models/chat');
+    var connectedUsers = {}
 
     io.on('connection', (socket) => {
         console.log('user connected to messages');
         //socket.emit('chat', { chat: 'route' });
+        //console.log(socket.handshake.session);
         socket.on('message', (data) => {
             console.log('server' + data);
             socket.emit('chat', data);
@@ -20,7 +22,7 @@ module.exports = function(io){
             Chat.find({participants: {$all: [user.id, req.body.friend], $size: 2} } )
             .exec(function(err, chats){
                 let ret = [];
-                for(let i = 0; i< chats.length; i++){
+                for(let i = 0; i < chats.length; i++){
                     console.log(chats[0]);
                     ret = chats[0].messages;
                 }
