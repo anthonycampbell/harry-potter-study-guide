@@ -69,11 +69,11 @@ export default function Friends({ friends, friendRequests }){
                 <input type='submit' value='Add Friend'/>
             </form>
             Friends:
-            {Object.keys(friends).map((username, i) => {
+            {Object.keys(friends).map((id, i) => {
                 return (
                     <div key={i}>
-                        <Chat friend={{ 'username': username,
-                                        'id': friends[username] }} socket={socket}/>
+                        <Chat friend={{ 'username': friends[id],
+                                        'id': id }} socket={socket}/>
                     </div>
                 )
             })}

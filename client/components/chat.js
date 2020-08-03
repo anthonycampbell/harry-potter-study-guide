@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-function ChatBox({socket}){
+function ChatBox({socket, friend}){
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
 
@@ -15,7 +15,8 @@ function ChatBox({socket}){
 
   function send(e){
     e.preventDefault()
-    socket.emit('message', message)
+    var msg = {message: message, id: friend}
+    socket.emit('message', msg)
     setMessage("")
   }
   return (
@@ -55,7 +56,7 @@ export default function Chat({friend, socket}){
     return(
       <>
         <button onClick={toggleChatBox}>{friend.username}</button>
-        { showChatBox ? <ChatBox socket={socket}/> : null}
+        { showChatBox ? <ChatBox socket={socket} friend={friend.id}/> : null}
       </>
     );
 }

@@ -1,3 +1,5 @@
+const user = require('../models/user');
+
 module.exports = function(io){
     var express = require('express');
     var router = express.Router();
@@ -5,15 +7,20 @@ module.exports = function(io){
     var Message = require('../models/message');
     var User = require('../models/user');
     var Chat = require ('../models/chat');
+    var cookie = require('cookie');
+    var jwt = require('jsonwebtoken');
     var connectedUsers = {}
 
     io.on('connection', (socket) => {
-        console.log('user connected to messages');
-        //socket.emit('chat', { chat: 'route' });
-        //console.log(socket.handshake.session);
+        let hope = cookie.parse(socket.handshake.headers.cookie);
+        jwt.verify(hope['jwt'], 'secret', function(err, decoded){
+            connectedUsers[decoded.id] = socket;
+        });
         socket.on('message', (data) => {
-            console.log('server' + data);
-            socket.emit('chat', data);
+            socket.emit('chat', data.message);
+            if (connectedUsers[data.id]){
+                connectedUsers[data.id].emit('chat', data.message);
+            }
         });
     });
 

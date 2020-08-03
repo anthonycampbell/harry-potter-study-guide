@@ -120,7 +120,7 @@ exports.friends_get = function(req, res, next){
             User.findById( friend ).exec(done);
         }, function (err, results){
             for (let i = 0; i < results.length; i++){
-                friends[results[i].username] = results[i].id;
+                friends[results[i].id] = results[i].username;
             }
             res.json({friends: friends});
         }); 
