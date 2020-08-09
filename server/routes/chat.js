@@ -9,6 +9,7 @@ module.exports = function(io){
     var Chat = require ('../models/chat');
     var cookie = require('cookie');
     var jwt = require('jsonwebtoken');
+    var async = require('async');
     var connectedUsers = {}
 
     io.on('connection', (socket) => {
@@ -26,15 +27,29 @@ module.exports = function(io){
 
     router.post('/', function(req, res, next){
         passport.authenticate('jwt', {session: false}, function(err, user, info){
-            Chat.find({participants: {$all: [user.id, req.body.friend], $size: 2} } )
-            .exec(function(err, chats){
-                let ret = [];
-                for(let i = 0; i < chats.length; i++){
-                    console.log(chats[0]);
-                    ret = chats[0].messages;
+            async.series([
+                function(cb){
+                    Chat.find({participants: {$all: [user.id, req.body.friend], $size: 2} } )
+                    .exec(function(err, chats){
+                        cb(null, chats);
+                    });
+                },
+                function(cb){
+                    User.findById(req.body.friend).exec(function(err, friend){
+                        cb(null, friend);
+                    })
                 }
-                res.send(ret);
-            });
+            ], function(err, results){
+                if (results[0].length === 0){
+                    const newChat = new Chat();
+                    newChat.participants.push(user.id);
+                    newChat.participants.push(req.body.friend);
+                    newChat.save();
+                    console.log(newChat);
+                } else {
+                    res.send(results[0].messages);
+                }
+            }); 
         })(req, res, next);
     });
     
