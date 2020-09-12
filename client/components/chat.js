@@ -1,37 +1,75 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { auth } from '../utils/authenticate';
+import io from 'socket.io-client'
 
-function ChatBox({socket, friend}){
+function useSocket(url, friend) {
+  const [socket, setSocket] = useState(null)
+  useEffect(() => {
+    const socketIo = io(url)
+    socketIo.emit('newChat', friend.id)
+    setSocket(socketIo)
+    function cleanup() {
+      socketIo.disconnect()
+    }
+    return cleanup
+  }, [])
+  return socket
+}
+
+function ChatBox({socket, friend, chat}){
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
+  const messagesEndRef = useRef(null)
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView()
+  }
 
   useEffect(() => {
     function handleEvent(data) {
       setMessages(oldMessages => [...oldMessages, data])
     }
     if (socket) {
-        socket.on('chat', handleEvent)
+        socket.on('newMessage', handleEvent)
       }
     }, [socket])
 
+  useEffect(scrollToBottom)
+
   function send(e){
     e.preventDefault()
-    var msg = {message: message, id: friend}
+    var msg = {message: message, id: friend, chat: chat.id}
     socket.emit('message', msg)
     setMessage("")
   }
   return (
-    <form onSubmit={send}>
-      {messages.map((v,i) => {
-        return  <li key={i}>{v}</li>
+    <div>
+      <div style={{ height: '250px',
+                    width: '200px',
+                    border: '1px solid black',
+                    overflow: 'auto'}} >
+        {messages.map((v,i) => {
+          return  <div key={i}>{v}</div>
         })}
-      <input type='text' value={message} onChange={e => setMessage(e.target.value)}/>
-      <input type='submit' value='send'/>
-    </form>
+        <div ref={messagesEndRef} />
+      </div>
+      <form onSubmit={send} >
+        <input type='text' value={message} onChange={e => setMessage(e.target.value)}/>
+        <input type='submit' value='send'/>
+      </form>
+    </div>
   );
 }
 
-export default function Chat({friend, socket}){
+export default function Chat({friend}){
     const [showChatBox, setChatBox] = useState(false)
+    const [chat, setChat] = useState({})
+    const socket = useSocket('http://localhost:3030', friend)
+
+    useEffect(() => {
+      if (socket){
+        socket.on('chat', (data) => setChat(data))
+      }
+    })
     
     async function toggleChatBox(e){
       setChatBox(!showChatBox)
@@ -56,7 +94,7 @@ export default function Chat({friend, socket}){
     return(
       <>
         <button onClick={toggleChatBox}>{friend.username}</button>
-        { showChatBox ? <ChatBox socket={socket} friend={friend.id}/> : null}
+        { showChatBox ? <ChatBox socket={socket} friend={friend.id} chat={chat}/> : null}
       </>
     );
 }

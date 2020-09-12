@@ -1,26 +1,10 @@
-import Link from 'next/link'
+import Link from 'next/link';
 import Router from 'next/router';
 import Chat from './chat';
-
-import io from 'socket.io-client'
 import { useState, useEffect } from 'react';
-
-function useSocket(url) {
-    const [socket, setSocket] = useState(null)
-    useEffect(() => {
-      const socketIo = io(url)
-      setSocket(socketIo)
-      function cleanup() {
-        socketIo.disconnect()
-      }
-      return cleanup
-    }, [])
-    return socket
-  }
 
 export default function Friends({ friends, friendRequests }){
     const [input, setInput] = useState({})
-    const socket = useSocket('http://localhost:3030')
 
     function handleChange(event){
         setInput({ ...input, [event.target.name]: event.target.value })
@@ -73,7 +57,7 @@ export default function Friends({ friends, friendRequests }){
                 return (
                     <div key={i}>
                         <Chat friend={{ 'username': friends[id],
-                                        'id': id }} socket={socket}/>
+                                        'id': id }}/>
                     </div>
                 )
             })}

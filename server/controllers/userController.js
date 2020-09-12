@@ -153,6 +153,7 @@ exports.friends_post = function(req, res, next){
 }
 
 exports.send_friend_request = function(req, res, next){
+    console.log(req.body.friend);
     passport.authenticate('jwt', {session: false}, function(err, user, info){
         if (err) { return next(err) }
         if (!user) { return res.send({status: 'Logged out'}) }
@@ -243,7 +244,7 @@ exports.process_friend_request = function (req, res, next){
                 }
             ], function(err, results){
                 if (err) {return next(err)}
-                res.send('friend added');
+                res.send('friend added'); 
             });
         } else if (req.body.answer === 'Decline'){
             UserFriendship.find({requester: req.body.requester,recipient: user.id}).exec(

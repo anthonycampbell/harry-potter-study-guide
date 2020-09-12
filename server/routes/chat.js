@@ -1,4 +1,6 @@
 const user = require('../models/user');
+const chat = require('../models/chat');
+const message = require('../models/message');
 
 module.exports = function(io){
     var express = require('express');
@@ -10,18 +12,40 @@ module.exports = function(io){
     var cookie = require('cookie');
     var jwt = require('jsonwebtoken');
     var async = require('async');
-    var connectedUsers = {}
 
     io.on('connection', (socket) => {
-        let hope = cookie.parse(socket.handshake.headers.cookie);
-        jwt.verify(hope['jwt'], 'secret', function(err, decoded){
-            connectedUsers[decoded.id] = socket;
+        socket.on('newChat', (friend) => {
+            let hope = cookie.parse(socket.handshake.headers.cookie);
+            jwt.verify(hope['jwt'], 'secret', function(err, decoded){
+                console.log(friend);
+                console.log(decoded.id);
+                async.series([
+                    function(cb) {
+                        Chat.findOne({participants: {$all: [decoded.id, friend], $size: 2} })
+                        .exec(function(err, chat){
+                            if (!chat) {
+                                let newChat = new Chat;
+                                newChat.participants.push(decoded.id);
+                                newChat.participants.push(friend);
+                                console.log('newchat', newChat);
+                                newChat.save((err, chat) => { 
+                                    socket.join(chat.id);
+                                    cb(null, chat);
+                                } );
+                                return
+                            } else {
+                                socket.join(chat.id);
+                                cb(null, chat);
+                            }
+                        });
+                    }], (err, results) => {
+                        console.log(results);
+                        socket.emit('chat', {id: results[0].id, messages: results[0].messages})
+                    });
+            });
         });
         socket.on('message', (data) => {
-            socket.emit('chat', data.message);
-            if (connectedUsers[data.id]){
-                connectedUsers[data.id].emit('chat', data.message);
-            }
+            io.to(data.chat).emit('newMessage', data.message);
         });
     });
 
