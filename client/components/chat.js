@@ -37,6 +37,8 @@ function ChatBox({socket, friend, chat}){
 
   function send(e){
     e.preventDefault()
+    console.log(friend)
+    console.log(chat.id)
     var msg = {message: message, id: friend, chat: chat.id}
     socket.emit('message', msg)
     setMessage("")
