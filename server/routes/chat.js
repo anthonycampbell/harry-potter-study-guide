@@ -70,32 +70,32 @@ module.exports = function(io){
     });
 
     router.post('/', function(req, res, next){
-        res.send('nothing');
-        /*passport.authenticate('jwt', {session: false}, function(err, user, info){
-            async.series([
+        passport.authenticate('jwt', {session: false}, function(err, user, info){
+            async.waterfall([
                 function(cb){
-                    Chat.find({participants: {$all: [user.id, req.body.friend], $size: 2} } )
-                    .exec(function(err, chats){
-                        cb(null, chats);
+                    Chat.findOne({ 
+                        $or: 
+                            [{participants: [user.id, req.body.friend]}, 
+                            {participants: [req.body.friend, user.id]}] })
+                    .exec(function(err, chat){ 
+                        cb(null, chat.messages);
                     });
                 },
-                function(cb){
-                    User.findById(req.body.friend).exec(function(err, friend){
-                        cb(null, friend);
-                    })
-                }
-            ], function(err, results){
-                if (results[0].length === 0){
-                    const newChat = new Chat();
-                    newChat.participants.push(user.id);
-                    newChat.participants.push(req.body.friend);
-                    newChat.save();
-                    console.log(newChat);
-                } else {
-                    res.send(results[0].messages);
-                }
-            }); 
-        })(req, res, next);*/
+                function(messages, cb){
+                    async.map(messages, 
+                        function(m , cb){
+                            Message.findById(m)
+                            .exec(function(err, mes){
+                                cb(null, mes);
+                            });
+                        }, (err, results) => {
+                            cb(null, results);
+                        }
+                    );
+                }], (err, result) => {
+                    res.json({messages: result});
+                });
+        })(req, res, next);
     });
     
     return router;

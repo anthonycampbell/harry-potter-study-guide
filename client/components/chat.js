@@ -16,7 +16,8 @@ function useSocket(url, friend) {
   return socket
 }
 
-function ChatBox({socket, friend, chat}){
+function ChatBox({socket, friend, chat, chatMessages}){
+  console.log(chatMessages)
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const messagesEndRef = useRef(null)
@@ -49,6 +50,16 @@ function ChatBox({socket, friend, chat}){
                     width: '200px',
                     border: '1px solid black',
                     overflow: 'auto'}} >
+        {chatMessages ? chatMessages.map((v,i) => {
+          if (v.id != friend){
+            return <div key={i}>
+                    <div>{v.writer}</div> 
+                    <div>{v.data}</div>
+                  </div> 
+          } else {
+            return  <div key={i}>{v.data}</div>
+          }
+        }) : null }
         {messages.map((v,i) => {
           return  <div key={i}>{v}</div>
         })}
@@ -66,6 +77,7 @@ export default function Chat({friend}){
     const [showChatBox, setChatBox] = useState(false)
     const [chat, setChat] = useState({})
     const socket = useSocket('http://localhost:3030', friend)
+    const [messages, setMessages] = useState([]);
 
     useEffect(() => {
       if (socket){
@@ -76,7 +88,6 @@ export default function Chat({friend}){
     async function toggleChatBox(e){
       setChatBox(!showChatBox)
       if (!showChatBox){
-        let messages
         try {
           let res = await fetch('http://localhost:3030/chat',{
             method: 'POST',
@@ -87,7 +98,9 @@ export default function Chat({friend}){
             },
             body: JSON.stringify({friend: friend.id})
           })
-          messages = await res.text()
+          let json = await res.json()
+          console.log(json.messages)
+          setMessages(json.messages)
         } catch(error) {
           console.error(error)
         }
@@ -96,7 +109,7 @@ export default function Chat({friend}){
     return(
       <>
         <button onClick={toggleChatBox}>{friend.username}</button>
-        { showChatBox ? <ChatBox socket={socket} friend={friend.id} chat={chat}/> : null}
+        { showChatBox ? <ChatBox socket={socket} friend={friend.id} chat={chat} chatMessages={messages}/> : null}
       </>
     );
 }
