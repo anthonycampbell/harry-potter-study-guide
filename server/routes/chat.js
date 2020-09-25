@@ -51,19 +51,20 @@ module.exports = function(io){
                         let newMessage = new Message;
                         newMessage.writer = decoded.id;
                         newMessage.data = data.message;
-                        newMessage.save();
-                        cb(null, newMessage.id);
+                        newMessage.save(function(err, msg){
+                            cb(null, newMessage);
+                        });
                     },
                     function(newMessage, cb){
-                        Chat.findByIdAndUpdate(data.chat, {$push: {messages: newMessage} }, (err) => {
+                        Chat.findByIdAndUpdate(data.chat, {$push: {messages: newMessage.id} }, (err) => {
                             if (err){
                                 console.log(err);
                                 return;
                             }
-                            cb(null);
+                            cb(null, newMessage);
                         });
-                    }], (err, result) => {
-                        io.to(data.chat).emit('newMessage', data.message);
+                    }], (err, newMessage) => {
+                        io.to(data.chat).emit('newMessage', newMessage);
                     });
             });
         });

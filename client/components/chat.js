@@ -16,8 +16,7 @@ function useSocket(url, friend) {
   return socket
 }
 
-function ChatBox({socket, friend, chat, chatMessages}){
-  console.log(chatMessages)
+function ChatBox({socket, friend, chat}){
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const messagesEndRef = useRef(null)
@@ -32,14 +31,34 @@ function ChatBox({socket, friend, chat, chatMessages}){
     if (socket) {
         socket.on('newMessage', handleEvent)
       }
-    }, [socket])
+  }, [socket])
+  
+  useEffect(() => {
+        async function getMessages(){
+          try {
+            let res = await fetch('http://localhost:3030/chat',{
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({friend: friend})
+            })
+            let json = await res.json()
+            console.log(json.messages)
+            setMessages(json.messages)
+          } catch(error) {
+            console.error(error)
+          }
+      }
+      getMessages()
+  }, [])
 
-  useEffect(scrollToBottom)
+  useEffect( () => {if(messagesEndRef.current){messagesEndRef.current.scrollIntoView()}})
 
   function send(e){
     e.preventDefault()
-    console.log(friend)
-    console.log(chat.id)
     var msg = {message: message, id: friend, chat: chat.id}
     socket.emit('message', msg)
     setMessage("")
@@ -50,20 +69,38 @@ function ChatBox({socket, friend, chat, chatMessages}){
                     width: '200px',
                     border: '1px solid black',
                     overflow: 'auto'}} >
-        {chatMessages ? chatMessages.map((v,i) => {
-          if (v.id != friend){
-            return <div key={i}>
-                    <div>{v.writer}</div> 
-                    <div>{v.data}</div>
-                  </div> 
-          } else {
-            return  <div key={i}>{v.data}</div>
-          }
-        }) : null }
         {messages.map((v,i) => {
-          return  <div key={i}>{v}</div>
+          if (v.writer == friend){
+            return <p style={{ maxWidth: '70%',
+                               margin: '2px',
+                               paddingLeft: '10px',
+                               paddingRight: '10px',
+                               paddingTop: '4px',
+                               paddingBottom: '4px',
+                               borderRadius: '10px',
+                               backgroundColor: '#e6e6e6',
+                               clear: 'both',
+                               float: 'left'}} key={i}>
+                                 {v.data}
+                   </p>
+          } else {
+            return <p style={{ maxWidth: '70%',
+                               margin: '2px',
+                               paddingLeft: '10px',
+                               paddingRight: '10px',
+                               paddingTop: '4px',
+                               paddingBottom: '4px',
+                               borderRadius: '10px',
+                               backgroundColor: 'dodgerblue',
+                               color: 'white',
+                               clear: 'both',
+                               float: 'right'}}
+                               key={i}>
+                                 {v.data}
+                   </p>
+          }
         })}
-        <div ref={messagesEndRef} />
+        <div style={{clear: 'both'}} ref={messagesEndRef} ></div>
       </div>
       <form onSubmit={send} >
         <input type='text' value={message} onChange={e => setMessage(e.target.value)}/>
@@ -85,31 +122,13 @@ export default function Chat({friend}){
       }
     })
     
-    async function toggleChatBox(e){
+    function toggleChatBox(e){
       setChatBox(!showChatBox)
-      if (!showChatBox){
-        try {
-          let res = await fetch('http://localhost:3030/chat',{
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({friend: friend.id})
-          })
-          let json = await res.json()
-          console.log(json.messages)
-          setMessages(json.messages)
-        } catch(error) {
-          console.error(error)
-        }
-      }
     }
     return(
       <>
         <button onClick={toggleChatBox}>{friend.username}</button>
-        { showChatBox ? <ChatBox socket={socket} friend={friend.id} chat={chat} chatMessages={messages}/> : null}
+        { showChatBox ? <ChatBox socket={socket} friend={friend.id} chat={chat}/> : null}
       </>
     );
 }
