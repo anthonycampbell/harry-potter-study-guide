@@ -16,7 +16,7 @@ function useSocket(url, friend) {
   return socket
 }
 
-function ChatBox({socket, friend, chat}){
+function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState([])
   const messagesEndRef = useRef(null)
@@ -26,6 +26,7 @@ function ChatBox({socket, friend, chat}){
 
   useEffect(() => {
     function handleEvent(data) {
+      console.log('data', data)
       setMessages(oldMessages => [...oldMessages, data])
     }
     if (socket) {
@@ -43,10 +44,9 @@ function ChatBox({socket, friend, chat}){
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
               },
-              body: JSON.stringify({friend: friend})
+              body: JSON.stringify({friend: friend.id})
             })
             let json = await res.json()
-            console.log(json.messages)
             setMessages(json.messages)
           } catch(error) {
             console.error(error)
@@ -59,18 +59,31 @@ function ChatBox({socket, friend, chat}){
 
   function send(e){
     e.preventDefault()
-    var msg = {message: message, id: friend, chat: chat.id}
+    var msg = {message: message, id: friend.id, chat: chat.id}
     socket.emit('message', msg)
     setMessage("")
   }
+  function chatBoxOff(e) {
+    var swap = [... openChats].fill(false)
+    swap.splice(index, 1, false)
+    setOpenChats(swap)
+  }
   return (
-    <div>
+    <div style={{position: 'fixed', 
+                 left: '0',
+                 bottom: '0',
+                 margin: '5px',
+                 textAlign: 'center'}}>
+      <button style={{width: '200px'}}
+              onClick={chatBoxOff}>
+                     {friend.username}
+      </button>
       <div style={{ height: '250px',
                     width: '200px',
                     border: '1px solid black',
                     overflow: 'auto'}} >
         {messages.map((v,i) => {
-          if (v.writer == friend){
+          if (v.writer == friend.id){
             return <p style={{ maxWidth: '70%',
                                margin: '2px',
                                paddingLeft: '10px',
@@ -103,18 +116,16 @@ function ChatBox({socket, friend, chat}){
         <div style={{clear: 'both'}} ref={messagesEndRef} ></div>
       </div>
       <form onSubmit={send} >
-        <input type='text' value={message} onChange={e => setMessage(e.target.value)}/>
-        <input type='submit' value='send'/>
+        <input style={{width: '152px'}} type='text' value={message} onChange={e => setMessage(e.target.value)}/>
+        <input style={{width: '40px'}} type='submit' value='send'/>
       </form>
     </div>
   );
 }
 
-export default function Chat({friend}){
-    const [showChatBox, setChatBox] = useState(false)
+export default function Chat({friend, openChats, index, setOpenChats}){
     const [chat, setChat] = useState({})
     const socket = useSocket('http://localhost:3030', friend)
-    const [messages, setMessages] = useState([]);
 
     useEffect(() => {
       if (socket){
@@ -123,12 +134,19 @@ export default function Chat({friend}){
     })
     
     function toggleChatBox(e){
-      setChatBox(!showChatBox)
+      var swap = [... openChats].fill(false)
+      swap.splice(index, 1, true)
+      setOpenChats(swap)
     }
     return(
       <>
-        <button onClick={toggleChatBox}>{friend.username}</button>
-        { showChatBox ? <ChatBox socket={socket} friend={friend.id} chat={chat}/> : null}
+        <button style={{width:'100%',
+                        paddingTop: '5px',
+                        paddingBottom: '5px'}}
+                        onClick={toggleChatBox}>
+                          {friend.username}
+        </button>
+        { openChats[index] ? <ChatBox socket={socket} friend={friend} chat={chat} openChats={openChats} index={index} setOpenChats={setOpenChats}/> : null}
       </>
     );
 }
