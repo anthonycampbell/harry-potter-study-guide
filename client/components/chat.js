@@ -34,7 +34,8 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
       }
   }, [socket])
   
-  useEffect(() => {
+  useEffect(() => { 
+        let mounted = true
         async function getMessages(){
           try {
             let res = await fetch('http://localhost:3030/chat',{
@@ -47,12 +48,15 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
               body: JSON.stringify({friend: friend.id})
             })
             let json = await res.json()
-            setMessages(json.messages)
+            if (mounted){
+              setMessages(json.messages)
+            }
           } catch(error) {
             console.error(error)
           }
       }
       getMessages()
+      return () => mounted = false
   }, [])
 
   useEffect( () => {if(messagesEndRef.current){messagesEndRef.current.scrollIntoView()}})

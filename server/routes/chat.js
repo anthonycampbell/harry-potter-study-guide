@@ -1,6 +1,7 @@
 const user = require('../models/user');
 const chat = require('../models/chat');
 const message = require('../models/message');
+const validator = require('express-validator');
 
 module.exports = function(io){
     var express = require('express');
@@ -44,6 +45,7 @@ module.exports = function(io){
             });
         });
         socket.on('message', (data) => {
+            validator.sanitizeBody('*').escape();
             let hope = cookie.parse(socket.handshake.headers.cookie);
             jwt.verify(hope['jwt'], 'secret', function(err, decoded){
                 async.waterfall([
@@ -52,6 +54,11 @@ module.exports = function(io){
                         newMessage.writer = decoded.id;
                         newMessage.data = data.message;
                         newMessage.save(function(err, msg){
+                            if (err){
+                                console.log(err);
+                                console.log('msg', data.message);
+                                return
+                            }
                             cb(null, newMessage);
                         });
                     },
