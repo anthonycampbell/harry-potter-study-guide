@@ -18,7 +18,7 @@ export default function Logout(){
 
     }
     return (
-        <form onSubmit={logout}>
+        <form  onSubmit={logout}>
             <input type='submit' value = 'Logout'/>
         </form>
     );

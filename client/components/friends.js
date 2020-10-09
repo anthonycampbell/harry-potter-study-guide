@@ -1,16 +1,17 @@
 import Link from 'next/link';
 import Router from 'next/router';
 import Chat from './chat';
+import Logout from './logout';
 import { useState, useEffect } from 'react';
 
-export default function Friends({ friends, friendRequests }){
+export default function Friends({ friends, friendRequests, children }){
     const [openChats, setOpenChats] = useState(new Array(Object.keys(friends).length).fill(false))
     const [input, setInput] = useState({})
 
     function handleChange(event){
         setInput({ ...input, [event.target.name]: event.target.value })
     }
-    
+
     async function addFriend(event){
         event.preventDefault()
         fetch('http://localhost:3030/friendRequests', {
@@ -48,12 +49,31 @@ export default function Friends({ friends, friendRequests }){
     }
     
     return (
-        <>
-            <form onSubmit={addFriend}>
-                <input type='text' name='friend' placeholder='email' required onChange={handleChange}/>
-                <input type='submit' value='Add Friend'/>
-            </form>
-
+        
+        <div>
+            <style jsx global>{`
+            body {
+                margin: 0px;
+                padding: 0px;
+            }
+            `}</style>
+            <div style={{ marginRight: '250px'}}>
+                <div style={{ backgroundColor: '#9ACD32',
+                              padding: '0px 8px 0px 8px',
+                              display: 'flex', alignItems: 'center',
+                              justifyContent: 'space-between'}} >
+                    <h1 >JOY</h1>
+                    <form onSubmit={addFriend}>
+                        <input type='text' name='friend' placeholder='email' required onChange={handleChange}/>
+                        <input type='submit' value='Add Friend'/>
+                    </form>
+                    <Logout />
+                </div>
+                <div style={{ margin: '8px'}}>
+                    {children}
+                </div>
+                
+            </div>
             <div style={{ position: 'fixed',
                           height: '100%',
                           backgroundColor: '#e6e6e6',
@@ -83,6 +103,6 @@ export default function Friends({ friends, friendRequests }){
                     )
                 })}
             </div>
-        </>
+        </div>
     );
 }

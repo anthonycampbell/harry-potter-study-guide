@@ -1,4 +1,5 @@
 import { auth } from '../../utils/authenticate'
+import { fetchUserData } from '../../utils/fetchUserData'
 function Entries({ data }){
     return(
         <>
@@ -46,6 +47,7 @@ function Entries({ data }){
 export async function getServerSideProps(ctx){
     auth(ctx, '/subject/'+ctx.query.id, '/login')
     let path = 'http://localhost:3030/harry_potter_study_guide/subject/'+ctx.query.id
+    let userData = await fetchUserData(ctx)
     let data
     try{
         let res = await fetch(path)
@@ -53,7 +55,7 @@ export async function getServerSideProps(ctx){
     } catch(error){
         console.error(error)
     }
-    return { props: {data : data} }
+    return { props: {friendRequests: userData.friendRequests, friends: userData.friends,  data: data } }
 }
 
 export default Entries

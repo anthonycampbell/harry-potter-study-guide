@@ -25,13 +25,17 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
   }
 
   useEffect(() => {
+    let mounted = true
     function handleEvent(data) {
       console.log('data', data)
-      setMessages(oldMessages => [...oldMessages, data])
+      if(mounted){
+        setMessages(oldMessages => [...oldMessages, data])
+      }
     }
     if (socket) {
-        socket.on('newMessage', handleEvent)
-      }
+      socket.on('newMessage', handleEvent)
+    }
+    return () => mounted = false
   }, [socket])
   
   useEffect(() => { 
@@ -74,7 +78,7 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
   }
   return (
     <div style={{position: 'fixed', 
-                 left: '0',
+                 right: '250px',
                  bottom: '0',
                  margin: '5px',
                  textAlign: 'center'}}>
