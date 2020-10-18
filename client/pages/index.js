@@ -5,7 +5,6 @@ import { fetchUserData } from '../utils/fetchUserData'
 export default function Index({ friends, friendRequests }){
   return (
     <>
-      <h1>You are logged in!</h1>
       <Link href='/subject'><a>Subjects</a></Link>
     </>
   );

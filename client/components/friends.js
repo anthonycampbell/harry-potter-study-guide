@@ -14,7 +14,7 @@ export default function Friends({ friends, friendRequests, children }){
 
     async function addFriend(event){
         event.preventDefault()
-        fetch('http://localhost:3030/friendRequests', {
+        await fetch('http://localhost:3030/friendRequests', {
             method: 'POST',
             headers: { 
                 'Accept': 'application/json',
@@ -85,8 +85,8 @@ export default function Friends({ friends, friendRequests, children }){
                     <h4 style={{ textAlign: 'center' }}>Friend Requests</h4>
                     { friendRequests.map((v,i) => {
                         return (
-                            <div key={i}>
-                                {v.username}
+                            <div key={i} style={{textAlign: 'center', marginTop: '5px', marginBottom: '5px'}}>
+                                <span>{v.username} </span>
                                 <button onClick={(e) => processRequest(e, v.id)}>Accept</button>
                                 <button onClick={(e) => processRequest(e, v.id)}>Decline</button>
                             </div>
