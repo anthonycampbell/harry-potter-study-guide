@@ -16,6 +16,14 @@ export default function Subject({ data }){
         setNewFields(newFields => [...newFields, null])
     }
 
+    function removeField(){
+        setNewFields(newFields => newFields.splice(-1,1))
+    }
+
+    function discardTable(){
+        setNewFields(newFields => [])
+    }
+
    return (
         <>
             <div>
@@ -27,6 +35,8 @@ export default function Subject({ data }){
             <div className='newTable'>
                 <NewSubject saveSubject={saveSubject} 
                             newFields={newFields} 
+                            removeField={removeField}
+                            discardTable={discardTable}
                             newTable={newTable} />
             </div>
         </>

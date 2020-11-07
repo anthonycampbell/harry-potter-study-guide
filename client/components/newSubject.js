@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export default function NewSubject({saveSubject, newFields, newTable}){
+export default function NewSubject({saveSubject, newFields, removeField, discardTable, newTable}){
     return(
         <form onSubmit={saveSubject}>
             <table>
@@ -14,13 +14,18 @@ export default function NewSubject({saveSubject, newFields, newTable}){
                         <td>
                             <button type='button' onClick={ newTable }>
                                 { newFields.length < 1 ? 
-                                    'New Table' : 'Another Field' }
+                                    'New Table' : '+' }
                             </button>
+                            { newFields.length > 0 ? 
+                                    <button type='button' onClick={ removeField }>-</button> : null }
                         </td>
                     </tr>
                 </tbody>
             </table>
-            { newFields.length > 0 && <input type='submit' value='Save New Table'/> }
+            { newFields.length > 0 && <div>
+                                        <input type='submit' value='Save New Table'/> 
+                                        <button type='button' onClick={ discardTable }>Discard table</button>
+                                    </div> }
         </form>
     );
 }

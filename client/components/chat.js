@@ -27,7 +27,6 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
   useEffect(() => {
     let mounted = true
     function handleEvent(data) {
-      console.log('data', data)
       if(mounted){
         setMessages(oldMessages => [...oldMessages, data])
       }
@@ -81,7 +80,8 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
                  right: '250px',
                  bottom: '0',
                  margin: '5px',
-                 textAlign: 'center'}}>
+                 textAlign: 'center',
+                 backgroundColor: 'white'}}>
       <button style={{width: '200px'}}
               onClick={chatBoxOff}>
                      {friend.username}
