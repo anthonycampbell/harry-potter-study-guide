@@ -1,31 +1,37 @@
 import Link from 'next/link'
 
-export default function NewSubject({saveSubject, newFields, removeField, discardTable, newTable}){
+function TableDeterminationButtons({discardTable, i}){
+    return (
+        <div>
+            <input type='submit' value='Save New Table'/> 
+            <button type='button' onClick={() => discardTable(i) }>Discard table</button>
+        </div> 
+    )
+}
+function THead({remField}){
+    return <tr><th><input type='text' placeholder='Enter Title' /></th></tr>
+}
+
+export default function NewSubject({saveSubject, table, i, addField, removeField, discardTable}){
     return(
-        <form onSubmit={saveSubject}>
+        <form onSubmit={(event) => saveSubject(event, i)}>
             <table>
                 <tbody>
-                    { newFields.length > 0 
-                    && <tr><th><input type= 'text' placeholder='Enter Title' /></th></tr> } 
+                    { table.title != null && <THead /> } 
                     <tr>
-                        { newFields.map((v,i) => {
-                            return (<td key={i}><input type='text' placeholder='Enter Field' /></td>)
-                        }) }
+                        {table.fields.map((v,i) => {
+                            return <td key={i}><input type='text' placeholder='Enter Field' /></td>
+                            })}
                         <td>
-                            <button type='button' onClick={ newTable }>
-                                { newFields.length < 1 ? 
-                                    'New Table' : '+' }
-                            </button>
-                            { newFields.length > 0 ? 
-                                    <button type='button' onClick={ removeField }>-</button> : null }
+                            {table.title != null && <button type='button' onClick={() => addField(i) }>+</button>}
+                            { table.fields.length > 0 ? 
+                                <button type='button' onClick={() => removeField(i) }>-</button> 
+                                : null }
                         </td>
                     </tr>
                 </tbody>
             </table>
-            { newFields.length > 0 && <div>
-                                        <input type='submit' value='Save New Table'/> 
-                                        <button type='button' onClick={ discardTable }>Discard table</button>
-                                    </div> }
+            { table.title != null && <TableDeterminationButtons discardTable={discardTable} i={i}/>}
         </form>
     );
 }

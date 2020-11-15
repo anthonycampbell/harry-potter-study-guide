@@ -4,24 +4,43 @@ import { auth } from '../../utils/authenticate'
 import { fetchUserData } from '../../utils/fetchUserData'
 
 export default function Subject({ data }){
-    const [newFields, setNewFields] = useState([])
+    const emptyTable = {
+        title: null,
+        fields: []
+    }
+    const [tables, setTables] = useState([emptyTable])
     let subjects = formatSubjects(data.subjects)
 
-    function saveSubject(event){
+    function saveSubject(event, i){
         event.preventDefault()
-        console.log(event.target)
+        console.log(tables[i])
+        discardTable(i)
     }
     
     function newTable(){
-        setNewFields(newFields => [...newFields, null])
+        setTables([...tables, {title: '', fields: ['']}])
+    }
+    function addField(i){
+        setTables(tables => {
+            tables[i].fields.push('')
+            return [...tables]
+        })
+    }
+    function removeField(i){
+        setTables(tables => {
+                tables[i].fields.pop()
+                return [...tables]
+            })
     }
 
-    function removeField(){
-        setNewFields(newFields => newFields.splice(-1,1))
-    }
-
-    function discardTable(){
-        setNewFields(newFields => [])
+    function discardTable(i){
+        setTables(tables => {
+            if (tables.length <= 1){
+                return [emptyTable]
+            }
+            tables.splice(i, 1)
+            return [...tables]
+        })
     }
 
    return (
@@ -33,12 +52,18 @@ export default function Subject({ data }){
                 </ul>
             </div>
             <div className='newTable'>
-                <NewSubject saveSubject={saveSubject} 
-                            newFields={newFields} 
-                            removeField={removeField}
-                            discardTable={discardTable}
-                            newTable={newTable} />
+                
+                {tables.map((v,i)=>{
+                    return <NewSubject saveSubject = {saveSubject} 
+                            table = {tables[i]} 
+                            i = {i}
+                            addField = {addField}
+                            removeField = {removeField}
+                            discardTable = {discardTable}
+                            key={i}/>
+                })}
             </div>
+            <button type='button' onClick={ newTable }>New Table</button>
         </>
     
    );
