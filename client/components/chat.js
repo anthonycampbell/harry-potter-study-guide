@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { auth } from '../utils/authenticate';
-import io from 'socket.io-client'
+//import io from 'socket.io-client'
 
-function useSocket(url, friend) {
+/*function useSocket(url, friend) {
   const [socket, setSocket] = useState(null)
   useEffect(() => {
     const socketIo = io(url)
@@ -14,17 +14,48 @@ function useSocket(url, friend) {
     return cleanup
   }, [])
   return socket
+}*/
+
+function useWS(url, friend) {
+  const [ws, setWS] = useState(null)
+  useEffect(() => {
+    const ws = new WebSocket(url)
+    ws.onopen = () => ws.send(JSON.stringify({ type: 'newChat', friend: friend.id}))
+    ws.onclose = () => console.log('ws closed')
+    setWS(ws)
+    return () => {
+      ws.close()
+    }
+  }, [])
+  return ws
 }
 
-function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
+function ChatBox({ws, friend, chat, openChats, index, setOpenChats, messages, setMessages}){
   const [message, setMessage] = useState("")
-  const [messages, setMessages] = useState([])
+  //const [messages, setMessages] = useState([])
   const messagesEndRef = useRef(null)
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView()
   }
 
-  useEffect(() => {
+  /*useEffect(() => {
+    let mounted = true
+    function handleEvent(data) {
+      if(mounted){
+        setMessages(oldMessages => [...oldMessages, data])
+      }
+    }
+    if (ws) {
+      ws.onmessage = (event) => {
+        let d = JSON.parse(event.data)
+        console.log(d.newMessage)
+        handleEvent(d.newMessage)
+      }
+    }
+    return () => mounted = false
+  }, [ws])*/
+
+  /*useEffect(() => {
     let mounted = true
     function handleEvent(data) {
       if(mounted){
@@ -35,7 +66,7 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
       socket.on('newMessage', handleEvent)
     }
     return () => mounted = false
-  }, [socket])
+  }, [socket])*/
   
   useEffect(() => { 
         let mounted = true
@@ -64,10 +95,16 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
 
   useEffect( () => {if(messagesEndRef.current){messagesEndRef.current.scrollIntoView()}})
 
-  function send(e){
+  /*function send(e){
     e.preventDefault()
     var msg = {message: message, id: friend.id, chat: chat.id}
-    socket.emit('message', msg)
+    //socket.emit('message', msg)
+    setMessage("")
+  }*/
+  function send(e){
+    e.preventDefault()
+    var msg = {type: 'message', message: message, id: friend.id, chat: chat.id}
+    ws.send( JSON.stringify(msg))
     setMessage("")
   }
   function chatBoxOff(e) {
@@ -133,13 +170,30 @@ function ChatBox({socket, friend, chat, openChats, index, setOpenChats}){
 
 export default function Chat({friend, openChats, index, setOpenChats}){
     const [chat, setChat] = useState({})
-    const socket = useSocket('http://localhost:3030', friend)
+    const [messages, setMessages] = useState([])
+    const ws = useWS('ws://localhost:3030/chat', friend, setMessages, setChat)
+    useEffect(() => {
+      if (ws){
+        ws.onmessage = (event) => {
+          let d = JSON.parse(event.data)
+          switch(d.type){
+            case 'chat':
+              setChat(d)
+              break;
+            case 'newMessage':
+              setMessages(oldMessages => [...oldMessages, d.newMessage])
+              break;
+          }
+        }
+      }
+    })
+    /*const socket = useSocket('http://localhost:3030', friend)
 
     useEffect(() => {
       if (socket){
         socket.on('chat', (data) => setChat(data))
       }
-    })
+    })*/
     
     function toggleChatBox(e){
       var swap = [... openChats].fill(false)
@@ -154,7 +208,7 @@ export default function Chat({friend, openChats, index, setOpenChats}){
                         onClick={toggleChatBox}>
                           {friend.username}
         </button>
-        { openChats[index] ? <ChatBox socket={socket} friend={friend} chat={chat} openChats={openChats} index={index} setOpenChats={setOpenChats}/> : null}
+        { openChats[index] ? <ChatBox ws={ws} friend={friend} chat={chat} openChats={openChats} index={index} setOpenChats={setOpenChats} messages={messages} setMessages={setMessages}/> : null}
       </>
     );
 }

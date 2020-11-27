@@ -1,9 +1,28 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import NewSubject, { formatSubjects } from '../../components/newSubject'
 import { auth } from '../../utils/authenticate'
 import { fetchUserData } from '../../utils/fetchUserData'
+import ShareDB from 'sharedb/lib/client'
 
 export default function Subject({ data }){
+    const [nc, setNC] = useState(0);
+    var socket = null
+    var connection = null
+    var doc = null
+    useEffect(()=>{
+        var socket = new WebSocket('ws://localhost:3030')
+        var connection = new ShareDB.Connection(socket)
+        doc = connection.get('examples', 'counter')
+        doc.subscribe(showNumbers)
+        doc.on('op', showNumbers)
+    })
+    function showNumbers() {
+        setNC(doc.data.numClicks)
+    };
+    function increment() {
+        doc.submitOp([{p: ['numClicks'], na: 1}])
+    }
+    
     const emptyTable = {
         title: null,
         fields: []
@@ -64,6 +83,9 @@ export default function Subject({ data }){
                 })}
             </div>
             <button type='button' onClick={ newTable }>New Table</button>
+            you clicked {nc} times
+            
+            <button type='button' onClick={increment} >+1</button>
         </>
     
    );

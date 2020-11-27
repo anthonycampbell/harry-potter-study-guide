@@ -5,11 +5,34 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
 var passport = require('passport');
-var io = require('socket.io')();
 var app = express();
+var WebSocket = require('ws');
+var ShareDB = require('sharedb');
+var WebSocketJSONStream = require('@teamwork/websocket-json-stream');
+
+var wssChat = new WebSocket.Server({ noServer: true });
+
+app.wssChat = wssChat;
+
+var wssShare = new WebSocket.Server({ noServer: true });
+app.wssShare = wssShare;
+var backend = new ShareDB();
+var connection = backend.connect();
+var doc = connection.get('examples', 'counter');
+doc.fetch(function(err) {
+  if (err) throw err;
+  if (doc.type === null) {
+    doc.create({numClicks: 0});
+    return;
+  }
+});
+wssShare.on('connection', function(ws) {
+  var stream = new WebSocketJSONStream(ws);
+  backend.listen(stream);
+});
 
 // Socket.io
-app.io = io;
+//app.io = io;
 
 // mongoose
 var mongoose = require('mongoose');
@@ -45,7 +68,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var harryPotterStudyGuideRouter = require('./routes/harry_potter_study_guide');
-var chatRouter = require('./routes/chat')(io);
+var chatRouter = require('./routes/chat')(wssChat);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/harry_potter_study_guide', harryPotterStudyGuideRouter);
@@ -54,7 +77,7 @@ app.use('/chat', chatRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   next(createError(404));
-});
+}); 
 
 // error handler
 app.use(function(err, req, res, next) {
