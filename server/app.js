@@ -11,28 +11,24 @@ var ShareDB = require('sharedb');
 var WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 
 var wssChat = new WebSocket.Server({ noServer: true });
-
 app.wssChat = wssChat;
 
 var wssShare = new WebSocket.Server({ noServer: true });
 app.wssShare = wssShare;
 var backend = new ShareDB();
-var connection = backend.connect();
-var doc = connection.get('examples', 'counter');
+var shareCon = backend.connect();
+var doc = shareCon.get('examples', 'subjects');
 doc.fetch(function(err) {
   if (err) throw err;
   if (doc.type === null) {
-    doc.create({numClicks: 0});
-    return;
+    doc.create({ tables: [{ title: null, fields: []}]});//[{title: null, fields: []}] });
   }
+  console.log('fetch');
 });
 wssShare.on('connection', function(ws) {
   var stream = new WebSocketJSONStream(ws);
   backend.listen(stream);
 });
-
-// Socket.io
-//app.io = io;
 
 // mongoose
 var mongoose = require('mongoose');

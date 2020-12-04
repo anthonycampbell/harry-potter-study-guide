@@ -14,11 +14,9 @@ module.exports = function(wss){
     var cookie = require('cookie');
     var jwt = require('jsonwebtoken');
     var async = require('async');
-    var chatRooms = {} 
-    var ids = {}
+    var chatRooms = {}
 
     wss.on('connection', function connection(ws, req) {
-        
         ws.on('message', (msg) => {
             let hope = cookie.parse(req.headers.cookie);
             let data = JSON.parse(msg);
@@ -87,74 +85,11 @@ module.exports = function(wss){
                                 chatRooms[data.chat].map( ws => {
                                     ws.send(response)
                                 });
-                                //io.to(data.chat).emit('newMessage', newMessage);
                             }); 
                 }
             });
         });
-        
     });
-
-    /*io.on('connection', (socket) => {
-        socket.on('newChat', (friend) => {
-            let hope = cookie.parse(socket.handshake.headers.cookie);
-            jwt.verify(hope['jwt'], 'secret', function(err, decoded){
-                async.series([
-                    function(cb) {
-                        Chat.findOne({ $or: [{participants: [decoded.id, friend]}, {participants: [friend, decoded.id]}] })
-                        .exec(function(err, chat){
-                            if (!chat) {
-                                let newChat = new Chat;
-                                newChat.participants.push(decoded.id);
-                                newChat.participants.push(friend);
-                                newChat.save((err, chat) => {
-                                    socket.join(chat.id);
-                                    cb(null, chat);
-                                });
-                                return;
-                            } else {
-                                socket.join(chat.id);
-                                cb(null, chat);
-                                return;
-                            }
-                        });
-                    }], (err, results) => {
-                        socket.emit('chat', {id: results[0].id, messages: results[0].messages})
-                });
-            });
-        });
-        socket.on('message', (data) => {
-            validator.sanitizeBody('*').escape();
-            let hope = cookie.parse(socket.handshake.headers.cookie);
-            jwt.verify(hope['jwt'], 'secret', function(err, decoded){
-                async.waterfall([
-                    function(cb){
-                        let newMessage = new Message;
-                        newMessage.writer = decoded.id;
-                        newMessage.data = data.message;
-                        newMessage.save(function(err, msg){
-                            if (err){
-                                console.log(err);
-                                console.log('msg', data.message);
-                                return
-                            }
-                            cb(null, newMessage);
-                        });
-                    },
-                    function(newMessage, cb){
-                        Chat.findByIdAndUpdate(data.chat, {$push: {messages: newMessage.id} }, (err) => {
-                            if (err){
-                                console.log(err);
-                                return;
-                            }
-                            cb(null, newMessage);
-                        });
-                    }], (err, newMessage) => {
-                        io.to(data.chat).emit('newMessage', newMessage);
-                    });
-            });
-        });
-    });*/
 
     router.post('/', function(req, res, next){
         passport.authenticate('jwt', {session: false}, function(err, user, info){

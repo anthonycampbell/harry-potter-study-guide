@@ -1,20 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { auth } from '../utils/authenticate';
-//import io from 'socket.io-client'
-
-/*function useSocket(url, friend) {
-  const [socket, setSocket] = useState(null)
-  useEffect(() => {
-    const socketIo = io(url)
-    socketIo.emit('newChat', friend.id)
-    setSocket(socketIo)
-    function cleanup() {
-      socketIo.disconnect()
-    }
-    return cleanup
-  }, [])
-  return socket
-}*/
 
 function useWS(url, friend) {
   const [ws, setWS] = useState(null)
@@ -32,41 +16,10 @@ function useWS(url, friend) {
 
 function ChatBox({ws, friend, chat, openChats, index, setOpenChats, messages, setMessages}){
   const [message, setMessage] = useState("")
-  //const [messages, setMessages] = useState([])
   const messagesEndRef = useRef(null)
   const scrollToBottom = () => {
     messagesEndRef.current.scrollIntoView()
   }
-
-  /*useEffect(() => {
-    let mounted = true
-    function handleEvent(data) {
-      if(mounted){
-        setMessages(oldMessages => [...oldMessages, data])
-      }
-    }
-    if (ws) {
-      ws.onmessage = (event) => {
-        let d = JSON.parse(event.data)
-        console.log(d.newMessage)
-        handleEvent(d.newMessage)
-      }
-    }
-    return () => mounted = false
-  }, [ws])*/
-
-  /*useEffect(() => {
-    let mounted = true
-    function handleEvent(data) {
-      if(mounted){
-        setMessages(oldMessages => [...oldMessages, data])
-      }
-    }
-    if (socket) {
-      socket.on('newMessage', handleEvent)
-    }
-    return () => mounted = false
-  }, [socket])*/
   
   useEffect(() => { 
         let mounted = true
@@ -95,12 +48,6 @@ function ChatBox({ws, friend, chat, openChats, index, setOpenChats, messages, se
 
   useEffect( () => {if(messagesEndRef.current){messagesEndRef.current.scrollIntoView()}})
 
-  /*function send(e){
-    e.preventDefault()
-    var msg = {message: message, id: friend.id, chat: chat.id}
-    //socket.emit('message', msg)
-    setMessage("")
-  }*/
   function send(e){
     e.preventDefault()
     var msg = {type: 'message', message: message, id: friend.id, chat: chat.id}
@@ -171,7 +118,7 @@ function ChatBox({ws, friend, chat, openChats, index, setOpenChats, messages, se
 export default function Chat({friend, openChats, index, setOpenChats}){
     const [chat, setChat] = useState({})
     const [messages, setMessages] = useState([])
-    const ws = useWS('ws://localhost:3030/chat', friend, setMessages, setChat)
+    const ws = useWS('ws://localhost:3030/chat', friend)
     useEffect(() => {
       if (ws){
         ws.onmessage = (event) => {
@@ -187,13 +134,6 @@ export default function Chat({friend, openChats, index, setOpenChats}){
         }
       }
     })
-    /*const socket = useSocket('http://localhost:3030', friend)
-
-    useEffect(() => {
-      if (socket){
-        socket.on('chat', (data) => setChat(data))
-      }
-    })*/
     
     function toggleChatBox(e){
       var swap = [... openChats].fill(false)
