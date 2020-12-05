@@ -8,26 +8,27 @@ function TableDeterminationButtons({discardTable, i}){
         </div> 
     )
 }
-function THead({handleChange, table, i, onKeyDown}){
+function THead({handleChange, table, i}){
     return <tr><th><input onChange={(e) => handleChange(e,i)}
                           type='text' 
                           placeholder='Enter Title' 
-                          value={table.title}
-                          onKeyDown={(e) => onKeyDown(e,i)}/></th></tr>
+                          value={table.title}/></th></tr>
 }
 
-export default function NewSubject({saveSubject, table, i, addField, removeField, discardTable, handleChange, onKeyDown}){
+export default function NewSubject({saveSubject, table, i, addField, removeField, discardTable, handleChange}){
     return(
         <form onSubmit={(event) => saveSubject(event, i)}>
             <table>
                 <tbody>
                     { table.title != null && <THead handleChange={handleChange}
                                                     table={table}
-                                                    i={i}
-                                                    onKeyDown={onKeyDown}/> } 
+                                                    i={i}/> } 
                     <tr>
-                        {table.fields.map((v,i) => {
-                            return <td key={i}><input type='text' placeholder='Enter Field' /></td>
+                        {table.fields.map((v,j) => {
+                            return <td key={j}><input onChange={(e) => handleChange(e,i,j)}
+                                                      type='text'
+                                                      placeholder='Enter Field'
+                                                      value={table.fields[j]} /></td>
                             })}
                         <td>
                             {table.title != null && <button type='button' onClick={() => addField(i) }>+</button>}

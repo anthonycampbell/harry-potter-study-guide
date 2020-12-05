@@ -3,6 +3,7 @@ import NewSubject, { formatSubjects } from '../../components/newSubject'
 import { auth } from '../../utils/authenticate'
 import { fetchUserData } from '../../utils/fetchUserData'
 import ShareDB from 'sharedb/lib/client'
+import dmpmod from 'diff_match_patch'
 
 function useForceUpdate(){
     const [value, setValue] = useState(0); // integer state
@@ -79,23 +80,15 @@ export default function Subject({ data }){
         })*/
     }
 
-    function handleChange(e, i){
-        /*let doc = connection.get('examples', 'subjects')
-        let o = Math.max(e.target.selectionStart - 1, 0)
-        console.log(o)
-        doc.submitOp([{p:['tables', i, 'title', o], si: e.target.value[o]}])*/
-    }
-
-    function onKeyDown(e, i){
-        /*let doc = connection.get('examples', 'subjects')
-        let o = e.target.selectionStart
-        console.log(e.target.value)
-        console.log(o)
-        console.log(e.key)
-        console.log(doc.data.tables[i].title[o-1])
-        if (e.key === 'Backspace' && o > 0){
-            doc.submitOp([{p:['tables', i, 'title', o-1], sd: doc.data.tables[i].title[o-1]}])
-        } */
+    function handleChange(e, i, j){
+        let doc = connection.get('examples', 'subjects')
+        if (e.target.placeholder === 'Enter Field'){
+            doc.submitOp([{p:['tables', i, 'fields', j, 0], sd: doc.data.tables[i].fields[j]}])
+            doc.submitOp([{p:['tables', i, 'fields', j, 0], si: e.target.value}])
+        } else {
+            doc.submitOp([{p:['tables', i, 'title', 0], sd: doc.data.tables[i].title}])
+            doc.submitOp([{p:['tables', i, 'title', 0], si: e.target.value}])
+        }
     }
 
     function saveSubject(event, i){
@@ -122,8 +115,7 @@ export default function Subject({ data }){
                             removeField = {removeField}
                             discardTable = {discardTable}
                             key={i}
-                            handleChange= {handleChange}
-                            onKeyDown = {onKeyDown}/>
+                            handleChange= {handleChange}/>
                 })}
             </div>
             <button type='button' onClick={ newTable }>New Table</button>
