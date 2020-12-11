@@ -6,7 +6,7 @@ var UserSchema = new Schema({
     email: {type: String, required: true},
     password: {type: String, required: true, min:8},
     date: {type: String, default: Date.now},
-    subjects: [{type: Schema.Types.ObjectId, ref: 'Subject'}],
+    studyGuides: [{type: Schema.Types.ObjectId, ref: 'StudyGuide'}],
     friends: [{type: Schema.Types.ObjectId, ref: 'User'}],
     chats: [{type: Schema.Types.ObjectId, ref: 'Chat'}]
 });

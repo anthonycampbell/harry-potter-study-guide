@@ -1,5 +1,5 @@
-import { auth } from '../../utils/authenticate'
-import { fetchUserData } from '../../utils/fetchUserData'
+import { auth } from '../../../utils/authenticate'
+import { fetchUserData } from '../../../utils/fetchUserData'
 function Entries({ data }){
     return(
         <>

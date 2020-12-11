@@ -1,20 +1,63 @@
 const validator = require('express-validator');
 var Subject = require('../models/subject.js');
-var Entry = require('../models/Entry');
+var Entry = require('../models/entry');
+var StudyGuide = require('../models/studyGuide')
+var User = require('../models/user');
+var passport = require('passport');
 var async = require('async');
+const studyGuide = require('../models/studyGuide');
 
 exports.index = function(req, res, next){
-    Subject.find({}).exec(function(err, results){
-        if (err){
-            next(err);
-        }
-        //res.render('index', {title: 'Home', subjects: results});
-        res.json({title: 'Home', subjects: results});
-    });
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        let studyGuides = [];
+        if (err) { return next(err) }
+        if (!user) { return res.send({status: 'Logged out'}) }
+        async.map(user.studyGuides, function(sg, done){
+            StudyGuide.findById( sg ).exec(done);
+        }, function (err, results){
+            for (let i = 0; i < results.length; i++){
+                studyGuides[i] = {title: results[i].title, id: results[i].id}
+            }
+            res.json({studyGuides: studyGuides});
+        });
+    })(req, res, next);
 }
 
 exports.subject_create = function(req, res, next){
-    res.json({subject: "create"});
+    //res.json({subject: "create"});
+    passport.authenticate('jwt', {session: false}, function(err, user, info){
+        if (err) { return next(err) }
+        if (!user) { return res.send({status: 'Logged out'}) }
+        async.waterfall([
+            function(cb){
+                let newStudyGuide = new StudyGuide();
+                newStudyGuide.title = req.body.newStudyGuide;
+                newStudyGuide.author = user.id;
+                newStudyGuide.save((err, g) => {
+                    if (err) {
+                        console.log(err);
+                        return
+                    }
+                    cb(null, g);
+                });
+            }, 
+            function(g, cb){
+                User.findByIdAndUpdate(
+                    user.id,
+                    {$push: {studyGuides: g.id }},
+                    function(err, d){
+                        if (err) { return next(err)}
+                        cb(null)
+                    }
+                );
+            }], function(err, results){
+                    async.map(user.studyGuides, function(sg, done){
+                        StudyGuide.findById( sg ).exec(done);
+                    }, function (err, results){
+                        res.json({studyGuides: results});
+                    });
+            });
+    })(req, res, next);
 }
 
 exports.subject_detail_get = function(req, res, next){

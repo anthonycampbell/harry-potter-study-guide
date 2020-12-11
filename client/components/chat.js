@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 
 function useWS(url, friend) {
   const [ws, setWS] = useState(null)
   useEffect(() => {
-    const ws = new WebSocket(url)
+    const ws = new ReconnectingWebSocket(url)
     ws.onopen = () => ws.send(JSON.stringify({ type: 'newChat', friend: friend.id}))
     ws.onclose = () => console.log('ws closed')
     setWS(ws)

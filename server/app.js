@@ -8,7 +8,6 @@ var passport = require('passport');
 var app = express();
 var WebSocket = require('ws');
 var ShareDB = require('sharedb');
-var WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 
 var wssChat = new WebSocket.Server({ noServer: true });
 app.wssChat = wssChat;
@@ -16,19 +15,8 @@ app.wssChat = wssChat;
 var wssShare = new WebSocket.Server({ noServer: true });
 app.wssShare = wssShare;
 var backend = new ShareDB();
-var shareCon = backend.connect();
-var doc = shareCon.get('examples', 'subjects');
-doc.fetch(function(err) {
-  if (err) throw err;
-  if (doc.type === null) {
-    doc.create({ tables: [{ title: null, fields: []}]});//[{title: null, fields: []}] });
-  }
-  console.log('fetch');
-});
-wssShare.on('connection', function(ws) {
-  var stream = new WebSocketJSONStream(ws);
-  backend.listen(stream);
-});
+
+
 
 // mongoose
 var mongoose = require('mongoose');
@@ -63,7 +51,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // routes
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var harryPotterStudyGuideRouter = require('./routes/harry_potter_study_guide');
+var harryPotterStudyGuideRouter = require('./routes/harry_potter_study_guide')(wssShare, backend);
 var chatRouter = require('./routes/chat')(wssChat);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
