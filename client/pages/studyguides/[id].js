@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
-import NewSubject, { formatSubjects } from '../../../components/newSubject'
-import { auth } from '../../../utils/authenticate'
-import { fetchUserData } from '../../../utils/fetchUserData'
+import NewSubject, { formatSubjects } from '../../components/newSubject'
+import { auth } from '../../utils/authenticate'
+import { fetchUserData } from '../../utils/fetchUserData'
 import ShareDB from 'sharedb/lib/client'
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import { useRouter } from 'next/router'
+
 
 function useForceUpdate(){
     const [value, setValue] = useState(0);
@@ -13,16 +15,18 @@ function useForceUpdate(){
 export default function Subject({ data }){
     const emptyTable = {title: null,fields: []}
     const [tables, setTables] = useState([emptyTable])
+    const router = useRouter()
     const connection = getConn()
     const forceUpdate = useForceUpdate();
-    let subjects = formatSubjects(data.subjects)
+    //let subjects = formatSubjects(data.subjects)
 
     function getConn(){
         const [conn, setConn] = useState(null)
         useEffect(()=>{
             var socket = new ReconnectingWebSocket('ws://localhost:3030')
             var connection = new ShareDB.Connection(socket)
-            let doc = connection.get('subjects', 'newTables')
+            console.log(router.query.id);
+            let doc = connection.get('new', router.query.id)
             doc.subscribe()
             doc.on('load', call)
             doc.on('op', call)
@@ -37,13 +41,13 @@ export default function Subject({ data }){
     }
     
     function newTable(){
-        let doc = connection.get('subjects', 'newTables')
+        let doc = connection.get('new', router.query.id)
         let l = doc.data.tables.length
         doc.submitOp([{p: ['tables', l+1], li:{title: '', fields: ['']} }])
     }
 
     function discardTable(i){
-        let doc = connection.get('subjects', 'newTables')
+        let doc = connection.get('new', router.query.id)
         let l = doc.data.tables.length
         let s = doc.data.tables[i]
         if (l <= 1){
@@ -54,19 +58,19 @@ export default function Subject({ data }){
     }
 
     function addField(i){
-        let doc = connection.get('subjects', 'newTables')
+        let doc = connection.get('new', router.query.id)
         let fl = doc.data.tables[i].fields.length
         doc.submitOp([{p:['tables', i, 'fields', fl], li: ''}])
     }
     function removeField(i){
-        let doc = connection.get('subjects', 'newTables')
+        let doc = connection.get('new', router.query.id)
         let l = doc.data.tables.length
         let fl = doc.data.tables[i].fields.length
         doc.submitOp([{p:['tables', i, 'fields', fl-1], ld: ''}])
     }
 
     function handleChange(e, i, j){
-        let doc = connection.get('subjects', 'newTables')
+        let doc = connection.get('new', router.query.id)
         if (e.target.placeholder === 'Enter Field'){
             doc.submitOp([{p:['tables', i, 'fields', j, 0], sd: doc.data.tables[i].fields[j]}])
             doc.submitOp([{p:['tables', i, 'fields', j, 0], si: e.target.value}])
@@ -84,12 +88,12 @@ export default function Subject({ data }){
 
    return (
         <>
-            <div>
+            {/*<div>
                 <h1>{data.title}</h1>
                 <ul>
                     {subjects}
                 </ul>
-            </div>
+            </div>*/}
             <div className='newTable'>
                 
                 {tables.map((v,i)=>{
@@ -109,18 +113,19 @@ export default function Subject({ data }){
    );
 }
 
+
+
 export async function getServerSideProps(ctx){
-    auth(ctx, '/subject/index', '/login')
+    auth(ctx, '/studyguides/'+ctx.query.id, '/login')
+    let path = 'http://localhost:3030/study_guide/'+ctx.query.id
     let userData = await fetchUserData(ctx)
-    /*let data
+    let data
     try{
-        let res = await fetch('http://localhost:3030/harry_potter_study_guide', {
-            credentials: 'include',
-            headers: ctx.req ? {cookie: ctx.req.headers.cookie} : undefined
-          })
+        let res = await fetch(path)
         data = await res.json()
-    } catch(error) {
+    } catch(error){
         console.error(error)
-    }*/
+    }
+    console.log(data)
     return { props: {friendRequests: userData.friendRequests, friends: userData.friends/*,  data: data */} }
-  }
+}

@@ -5,7 +5,6 @@ var StudyGuide = require('../models/studyGuide')
 var User = require('../models/user');
 var passport = require('passport');
 var async = require('async');
-const studyGuide = require('../models/studyGuide');
 
 exports.index = function(req, res, next){
     passport.authenticate('jwt', {session: false}, function(err, user, info){
@@ -61,7 +60,7 @@ exports.subject_create = function(req, res, next){
 }
 
 exports.subject_detail_get = function(req, res, next){
-    async.parallel({
+    /*async.parallel({
         subject: function(callback){
             Subject.findById(req.params.id).exec(callback);
         },
@@ -74,7 +73,8 @@ exports.subject_detail_get = function(req, res, next){
         }
         res.json({title: results.subject.title, subject: results.subject, entries: results.entries});
         //res.render('subject_detail', {title: results.subject.title, subject: results.subject, entries: results.entries});
-    });
+    });*/
+    res.json({ yo: 'bro'});
 }
 
 exports.subject_detail_post = function (req, res, next) {

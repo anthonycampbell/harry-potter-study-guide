@@ -17,7 +17,7 @@ const fetcher = (url, input) => {
 export default function Index({ friends, friendRequests, sgs }){
   const studyGuides = sgs
   const [input, setInput] = useState({newStudyGuide: ''})
-  const { data } = useSWR('http://localhost:3030/harry_potter_study_guide',
+  const { data } = useSWR('http://localhost:3030/study_guide',
                           fetcher,
                           {initialData: {studyGuides}})
 
@@ -27,9 +27,9 @@ export default function Index({ friends, friendRequests, sgs }){
 
   async function handleSubmit(e){
     e.preventDefault()
-    await fetcher('http://localhost:3030/harry_potter_study_guide', input)
+    await fetcher('http://localhost:3030/study_guide', input)
     setInput({newStudyGuide: ''})
-    mutate('http://localhost:3030/harry_potter_study_guide')
+    mutate('http://localhost:3030/study_guide')
   } 
   return (
     <>
@@ -37,7 +37,7 @@ export default function Index({ friends, friendRequests, sgs }){
       {!data ? <div>loading...</div> : data.studyGuides.map((v,i) => {
         return (
           <div key={data.studyGuides[i].id}>
-          <Link href='/[id]' as={`${data.studyGuides[i].id}`} >
+          <Link href='/studyguides/[id]' as={`/studyguides/${data.studyGuides[i].id}`} >
             <a>{data.studyGuides[i].title}</a>
           </Link>
           </div>
@@ -63,7 +63,7 @@ export async function getServerSideProps(ctx){
   let userData = await fetchUserData(ctx)
   let studyGuides = []
   try{
-    let res = await fetch('http://localhost:3030/harry_potter_study_guide', {
+    let res = await fetch('http://localhost:3030/study_guide', {
       credentials: 'include',
       headers: { cookie: ctx.req.headers.cookie }
     })

@@ -46,7 +46,7 @@ function Entries({ data }){
 
 export async function getServerSideProps(ctx){
     auth(ctx, '/subject/'+ctx.query.id, '/login')
-    let path = 'http://localhost:3030/harry_potter_study_guide/subject/'+ctx.query.id
+    let path = 'http://localhost:3030/study_guide/subject/'+ctx.query.id
     let userData = await fetchUserData(ctx)
     let data
     try{

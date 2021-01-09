@@ -30,7 +30,7 @@
     "passport.socketio": "^3.7.0",
     "pug": "2.0.0-beta11",
     "sharedb": "^1.5.0",
-    "sharedb-mongo": "^1.0.0-beta.14",
+    "sharedb-mongo": "^1.0.0-beta.15",
     "socket.io": "^2.3.0",
     "url": "^0.11.0",
     "ws": "^7.4.0"

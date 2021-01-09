@@ -8,19 +8,18 @@ var passport = require('passport');
 var app = express();
 var WebSocket = require('ws');
 var ShareDB = require('sharedb');
+var mongoDB = 'mongodb+srv://anthony:ArchieComics9@cluster0-hh67p.azure.mongodb.net/harry_potter?retryWrites=true&w=majority';
+var smdb = require('sharedb-mongo')(mongoDB, {mongoOptions: {useNewUrlParser: true, useUnifiedTopology: true}});
 
 var wssChat = new WebSocket.Server({ noServer: true });
 app.wssChat = wssChat;
 
 var wssShare = new WebSocket.Server({ noServer: true });
 app.wssShare = wssShare;
-var backend = new ShareDB();
-
-
+var backend = new ShareDB({db: smdb});
 
 // mongoose
 var mongoose = require('mongoose');
-var mongoDB = 'mongodb+srv://anthony:ArchieComics9@cluster0-hh67p.azure.mongodb.net/harry_potter?retryWrites=true&w=majority';
 mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
@@ -51,11 +50,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // routes
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var harryPotterStudyGuideRouter = require('./routes/harry_potter_study_guide')(wssShare, backend);
+var studyGuideRouter = require('./routes/study_guide')(wssShare, backend);
 var chatRouter = require('./routes/chat')(wssChat);
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/harry_potter_study_guide', harryPotterStudyGuideRouter);
+app.use('/study_guide', studyGuideRouter);
 app.use('/chat', chatRouter);
 
 // catch 404 and forward to error handler
