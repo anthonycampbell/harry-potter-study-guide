@@ -1,0 +1,41 @@
+.t {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 0; 
+    margin: 0;
+}
+
+.d {
+    width: 100%;
+    overflow: scroll;
+    border: 1px solid black;
+}
+
+.ta {
+    outline: none;
+    resize: none;
+    border: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+.td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    vertical-align: top;
+    padding: 0; 
+    margin: 0;
+    min-width: 154px;
+}
+
+.tds {
+    border: 1px solid black;
+    border-collapse: collapse;
+    vertical-align: top;
+    padding: 0; 
+    margin: 0;
+    min-width: 154px;
+    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
+    border: 1px solid rgba(81, 203, 238, 1);
+}

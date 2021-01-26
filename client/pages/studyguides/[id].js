@@ -80,13 +80,7 @@ export default function Subject({ data }){
         }
     }
 
-    function saveSubject(event, i){
-        event.preventDefault()
-        console.log(tables[i])
-        discardTable(i)
-    }
-
-   return (
+    return (
         <>
             {/*<div>
                 <h1>{data.title}</h1>
@@ -97,7 +91,7 @@ export default function Subject({ data }){
             <div className='newTable'>
                 
                 {tables.map((v,i)=>{
-                    return <NewSubject saveSubject = {saveSubject} 
+                    return <NewSubject
                             table = {tables[i]} 
                             i = {i}
                             addField = {addField}
