@@ -5,13 +5,9 @@
     margin: 0;
 }
 
-.d {
-    width: 100%;
-    overflow: scroll;
-    border: 1px solid black;
-}
-
 .ta {
+    display: table-cell;
+    vertical-align: inherit;
     outline: none;
     resize: none;
     border: none;
@@ -20,7 +16,21 @@
     box-shadow: none;
 }
 
+.tas {
+    display: table-cell;
+    vertical-align: inherit;
+    outline: none;
+    resize: none;
+    border: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    background-color: lightblue;
+}
+
 .td {
+    display: table-cell;
+    vertical-align: inherit;
     border: 1px solid black;
     border-collapse: collapse;
     vertical-align: top;
@@ -30,12 +40,72 @@
 }
 
 .tds {
+    display: table-cell;
+    vertical-align: inherit;
     border: 1px solid black;
     border-collapse: collapse;
     vertical-align: top;
     padding: 0; 
     margin: 0;
     min-width: 154px;
-    box-shadow: 0 0 5px rgba(81, 203, 238, 1);
-    border: 1px solid rgba(81, 203, 238, 1);
+    background-color: lightblue;
+}
+
+.th {
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    vertical-align: top;
+    padding: 0; 
+    margin: 0;
+    min-width: 154px;
+    background-color: #4CAF50;
+}
+
+.ths{
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: bold;
+    text-align: center;
+    border: 1px solid black;
+    border-collapse: collapse;
+    vertical-align: top;
+    padding: 0; 
+    margin: 0;
+    min-width: 154px;
+    background-color: #3e8e41;
+}
+
+.tha {
+    outline: none;
+    resize: none;
+    border: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #4CAF50;
+}
+
+.thas {
+    outline: none;
+    resize: none;
+    border: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    display: table-cell;
+    vertical-align: inherit;
+    font-weight: bold;
+    text-align: center;
+    color: white;
+    background-color: #3e8e41;
+    
 }

@@ -58,7 +58,7 @@ export default function Friends({ friends, friendRequests, children }){
             }
             `}</style>
             <div style={{ marginRight: '250px'}}>
-                <div style={{ backgroundColor: '#9ACD32',
+                <div style={{ backgroundColor: '#4CAF50',
                               padding: '0px 8px 0px 8px',
                               display: 'flex', alignItems: 'center',
                               justifyContent: 'space-between'}} >

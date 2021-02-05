@@ -22,7 +22,7 @@ module.exports = function(wssShare, backend){
         doc.fetch(function(err) {
             if (err) throw err;
             if (doc.type === null) {
-                doc.create({ tables: [{ title: null, fields: []}]}, function(err){
+                doc.create({ tables: [{ title: null, fields: [], rows: [[]]}]}, function(err){
                     if (err) throw err;
                     res.json({se: 'sir'});
                 });

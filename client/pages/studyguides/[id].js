@@ -13,12 +13,11 @@ function useForceUpdate(){
 }
 
 export default function Subject({ data }){
-    const emptyTable = {title: null,fields: []}
+    const emptyTable = {title: null, fields: [], rows: [[]]}
     const [tables, setTables] = useState([emptyTable])
     const router = useRouter()
     const connection = getConn()
     const forceUpdate = useForceUpdate();
-    //let subjects = formatSubjects(data.subjects)
 
     function getConn(){
         const [conn, setConn] = useState(null)
@@ -43,7 +42,7 @@ export default function Subject({ data }){
     function newTable(){
         let doc = connection.get('new', router.query.id)
         let l = doc.data.tables.length
-        doc.submitOp([{p: ['tables', l+1], li:{title: '', fields: ['']} }])
+        doc.submitOp([{p: ['tables', l+1], li:{title: '', fields: [''], rows:[['']]} }])
     }
 
     function discardTable(i){
@@ -61,19 +60,44 @@ export default function Subject({ data }){
         let doc = connection.get('new', router.query.id)
         let fl = doc.data.tables[i].fields.length
         doc.submitOp([{p:['tables', i, 'fields', fl], li: ''}])
+        for(let j = 0; j < doc.data.tables[i].rows.length; j++){
+            let rl = doc.data.tables[i].rows[j].length
+            doc.submitOp([{p:['tables', i, 'rows', j, rl], li: ''}])
+        }
     }
+
     function removeField(i){
         let doc = connection.get('new', router.query.id)
         let l = doc.data.tables.length
         let fl = doc.data.tables[i].fields.length
         doc.submitOp([{p:['tables', i, 'fields', fl-1], ld: ''}])
+        for(let j = 0; j < doc.data.tables[i].rows.length; j++){
+            let rl = doc.data.tables[i].rows[j].length
+            doc.submitOp([{p:['tables', i, 'rows', j, rl-1], ld: ''}])
+        }
     }
 
-    function handleChange(e, i, j){
+    function addRow(i){
+        let doc = connection.get('new', router.query.id)
+        let rl = doc.data.tables[i].rows.length
+        doc.submitOp([{p:['tables', i, 'rows', rl], li: Array(doc.data.tables[i].fields.length).fill('')}])
+    }
+
+    function removeRow(i){
+        let doc = connection.get('new', router.query.id)
+        let l = doc.data.tables.length
+        let rl = doc.data.tables[i].rows.length
+        doc.submitOp([{p:['tables', i, 'rows', rl-1], ld: ['']}])
+    }
+
+    function handleChange(e, i, j, k){
         let doc = connection.get('new', router.query.id)
         if (e.target.placeholder === 'Enter Field'){
             doc.submitOp([{p:['tables', i, 'fields', j, 0], sd: doc.data.tables[i].fields[j]}])
             doc.submitOp([{p:['tables', i, 'fields', j, 0], si: e.target.value}])
+        } else if (e.target.placeholder === 'Enter Cell'){
+            doc.submitOp([{p:['tables', i, 'rows', j, k, 0], sd: doc.data.tables[i].rows[j][k]}])
+            doc.submitOp([{p:['tables', i, 'rows', j, k, 0], si: e.target.value}])
         } else {
             doc.submitOp([{p:['tables', i, 'title', 0], sd: doc.data.tables[i].title}])
             doc.submitOp([{p:['tables', i, 'title', 0], si: e.target.value}])
@@ -82,26 +106,26 @@ export default function Subject({ data }){
 
     return (
         <>
-            {/*<div>
-                <h1>{data.title}</h1>
-                <ul>
-                    {subjects}
-                </ul>
-            </div>*/}
-            <div className='newTable'>
-                
-                {tables.map((v,i)=>{
-                    return <NewSubject
-                            table = {tables[i]} 
-                            i = {i}
-                            addField = {addField}
-                            removeField = {removeField}
-                            discardTable = {discardTable}
-                            key={i}
-                            handleChange= {handleChange}/>
-                })}
+            <div className='newTable' 
+                 style={{overflow: 'scroll', width: '100%'}}>
+                    {tables.map((v,i)=>{
+                        return <NewSubject table = {tables[i]} 
+                                           i = {i}
+                                           addField = {addField}
+                                           removeField = {removeField}
+                                           addRow = {addRow}
+                                           removeRow = {removeRow}
+                                           discardTable = {discardTable}
+                                           key={i}
+                                           handleChange= {handleChange}/>
+                    })}
             </div>
-            <button type='button' onClick={ newTable }>New Table</button>
+            <button type='button'
+                    onClick={ newTable }
+                    style={{marginTop: '1em',
+                            marginBottom: '1em'}}>
+                        New Table
+            </button>
         </>
     
    );
