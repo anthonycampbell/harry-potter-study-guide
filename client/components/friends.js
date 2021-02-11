@@ -62,7 +62,7 @@ export default function Friends({ friends, friendRequests, children }){
                               padding: '0px 8px 0px 8px',
                               display: 'flex', alignItems: 'center',
                               justifyContent: 'space-between'}} >
-                    <h1 >JOY</h1>
+                    <h1 ><Link href="/"><a style={{color: 'black'}}>JOY</a></Link></h1>
                     <form onSubmit={addFriend}>
                         <input type='text' name='friend' placeholder='email' required onChange={handleChange}/>
                         <input type='submit' value='Add Friend'/>

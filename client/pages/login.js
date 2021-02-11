@@ -32,10 +32,10 @@ export default function Login(){
             <h1>Login</h1>
             <form onSubmit={handleSubmit}>
                 <label>email:
-                    <input type='text' name='email' onChange={handleChange} />
+                    <input type='text' name='email' required onChange={handleChange} />
                 </label>
                 <label>password:
-                    <input type='password' name='password' onChange={handleChange} />
+                    <input type='password' name='password' required onChange={handleChange} />
                 </label>
                     <input type="submit" value='submit' />
             </form>

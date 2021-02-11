@@ -24,7 +24,6 @@ export default function Subject({ data }){
         useEffect(()=>{
             var socket = new ReconnectingWebSocket('ws://localhost:3030')
             var connection = new ShareDB.Connection(socket)
-            console.log(router.query.id);
             let doc = connection.get('new', router.query.id)
             doc.subscribe()
             doc.on('load', call)

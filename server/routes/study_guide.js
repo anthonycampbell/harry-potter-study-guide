@@ -30,7 +30,7 @@ module.exports = function(wssShare, backend){
                 res.json({we: 'gucci'});
             }
         });
-    });//subject_controller.subject_detail_get);
+    });
     router.post('/subject/:id', subject_controller.subject_detail_post);
     return router;
 } 

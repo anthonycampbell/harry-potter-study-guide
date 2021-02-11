@@ -31,13 +31,13 @@ export default function Register(){
         <h1>Register</h1>
         <form onSubmit={handleSubmit}>
           <label>username:
-            <input type='text' name='username' onChange={handleChange} />
+            <input type='text' name='username' required onChange={handleChange} />
           </label>
           <label>email:
-            <input type='text' name='email' onChange={handleChange} />
+            <input type='text' name='email' required onChange={handleChange} />
           </label>
           <label>password:
-            <input type='password' name='password' onChange={handleChange} />
+            <input type='password' name='password' required onChange={handleChange} />
           </label>
           <input type="submit" value='submit' />
         </form>

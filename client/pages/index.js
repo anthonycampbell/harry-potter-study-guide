@@ -47,7 +47,8 @@ export default function Index({ friends, friendRequests, sgs }){
         <input type='text'
                name='newStudyGuide' 
                value={input.newStudyGuide} 
-               placeholder='Input Title' 
+               placeholder='Input Title'
+               required 
                onChange={handleChange}></input>
         <input type='submit' 
                value='New Study Guide'></input>

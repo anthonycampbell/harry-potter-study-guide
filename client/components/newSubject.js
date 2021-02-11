@@ -22,7 +22,6 @@ function TH({handleChange, i, j, table, active, setSelected}){
     const inputElement = useRef(null)
     function handleClick(e){
         inputElement.current.focus();
-        console.log('0'+j)
         setSelected('0'+j)
     }
     return (
@@ -39,7 +38,6 @@ function TD({handleChange, i, j, k, table, active, setSelected}){
     const inputElement = useRef(null)
     function handleClick(e){
         inputElement.current.focus();
-        console.log(''+(j+1)+k)
         setSelected(''+(j+1)+k)
     }
     return (

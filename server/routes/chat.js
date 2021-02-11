@@ -24,35 +24,37 @@ module.exports = function(wss){
                 switch(data.type){
                     case 'newChat': 
                         let friend = data.friend;
-                        async.series([
+                        async.waterfall([
                             function(cb) {
                                 Chat.findOne({ $or: [{participants: [decoded.id, friend]}, {participants: [friend, decoded.id]}] })
                                 .exec(function(err, chat){
-                                    let cid;
                                     if (!chat) {
                                         let newChat = new Chat;
                                         newChat.participants.push(decoded.id);
                                         newChat.participants.push(friend);
                                         newChat.save((err, chat) => {
-                                            cid = chat.id;
+                                            cb(null, chat.id);
                                         });
                                     } else {
-                                        cid = chat.id;
+                                        cb(null, chat.id);
                                     }
-                                    if(chatRooms[cid]){
-                                        let chatters = chatRooms[cid];
+                                });
+                            }, 
+                            function(c, cb){
+                                Chat.findById(c).exec(function(err, chat){
+                                    if(chatRooms[c]){
+                                        let chatters = chatRooms[c];
                                         chatters.push(ws);
                                         chatters = [... new Set(chatters)];
-                                        chatRooms[cid] = chatters;
+                                        chatRooms[cb] = chatters;
                                     } else {
-                                        chatRooms[cid] = [ws];
+                                        chatRooms[c] = [ws];
                                     }
                                     cb(null, chat);
-                                    return;
                                 });
                             }], (err, chat) => {
-                                let response = {type: 'chat', id: chat[0].id, messages: chat[0].messages};
-                                chatRooms[chat[0].id].map( ws => {
+                                let response = {type: 'chat', id: chat.id, messages: chat.messages};
+                                chatRooms[chat.id].map( ws => {
                                     ws.send(JSON.stringify(response));
                                 });
                         });
