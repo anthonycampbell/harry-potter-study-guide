@@ -34,8 +34,10 @@ require('./config/passport')(passport);
 
 // cors
 var corsOpts = {
-  origin: 'http://localhost:3000',
-  credentials: true
+	origin: 'http://ec2-3-138-204-233.us-east-2.compute.amazonaws.com/, http://localhost:3000',
+  credentials: true,
+  allowedHeaders: 'content-type',
+  exposedHeaders: 'access-control-allow-origin,access-control-allow-methods,access-control-allow-headers',
 }
 app.use(cors(corsOpts));
 

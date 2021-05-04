@@ -22,7 +22,7 @@ export default function Subject({ data }){
     function getConn(){
         const [conn, setConn] = useState(null)
         useEffect(()=>{
-            var socket = new ReconnectingWebSocket('ws://localhost:3030')
+            var socket = new ReconnectingWebSocket('ws://ec2-3-138-204-233.us-east-2.compute.amazonaws.com/server/')
             var connection = new ShareDB.Connection(socket)
             let doc = connection.get('new', router.query.id)
             doc.subscribe()
@@ -134,7 +134,7 @@ export default function Subject({ data }){
 
 export async function getServerSideProps(ctx){
     auth(ctx, '/studyguides/'+ctx.query.id, '/login')
-    let path = 'http://localhost:3030/study_guide/'+ctx.query.id
+    let path = 'server/study_guide/'+ctx.query.id
     let userData = await fetchUserData(ctx)
     let data
     try{

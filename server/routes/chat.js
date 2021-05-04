@@ -92,7 +92,9 @@ module.exports = function(wss){
             });
         });
     });
-
+    router.get('/', function(req, res, next){
+	    res.send('good');
+    });
     router.post('/', function(req, res, next){
         passport.authenticate('jwt', {session: false}, function(err, user, info){
             async.waterfall([

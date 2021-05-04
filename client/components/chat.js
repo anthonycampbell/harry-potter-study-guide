@@ -26,7 +26,7 @@ function ChatBox({ws, friend, chat, openChats, index, setOpenChats, messages, se
         let mounted = true
         async function getMessages(){
           try {
-            let res = await fetch('http://localhost:3030/chat',{
+            let res = await fetch('server/chat',{
               method: 'POST',
               credentials: 'include',
               headers: {
@@ -119,7 +119,7 @@ function ChatBox({ws, friend, chat, openChats, index, setOpenChats, messages, se
 export default function Chat({friend, openChats, index, setOpenChats}){
     const [chat, setChat] = useState({})
     const [messages, setMessages] = useState([])
-    const ws = useWS('ws://localhost:3030/chat', friend)
+    const ws = useWS('ws://ec2-3-138-204-233.us-east-2.compute.amazonaws.com/server/chat', friend)
     useEffect(() => {
       if (ws){
         ws.onmessage = (event) => {

@@ -5,7 +5,7 @@ export default function Logout(){
     async function logout(event){
         event.preventDefault()
         try{
-            let res = await fetch('http://localhost:3030/logout', {
+            let res = await fetch('server/logout', {
                 method: 'POST',
                 credentials: 'include'
               })

@@ -4,6 +4,8 @@ var user_controller = require('../controllers/userController');
 var passport = require('passport');
 
 /* GET home page. */
+router.get('/', function  (req, res, next){res.send('hello world1')} );
+router.get('/server', function  (req, res, next){res.send('cramps')} );
 router.post('/register', user_controller.register);
 router.post('/login', user_controller.login);
 router.post('/logout', passport.authenticate('jwt', {session: false}), user_controller.logout);

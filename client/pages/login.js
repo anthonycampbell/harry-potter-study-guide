@@ -12,7 +12,7 @@ export default function Login(){
 
     function handleSubmit(event){
         event.preventDefault()
-        fetch('http://localhost:3030/login', {
+        fetch('server/login', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',

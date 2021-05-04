@@ -81,10 +81,15 @@ exports.login = [
         }
         const email = req.body.email;
         const password = req.body.password;
+	console.log(email, password);
         User.findOne({email}).exec( (err, user) => {
+		console.log(user);
             if (err){
                 next(err);
             }
+	    if (!user){
+		    return res.status(400).json({incorrectUser: "Incorrect User"});
+	    }
             bcrypt.compare(password, user.password, (err, isMatch) => {
                 if (isMatch){
                     const payload = {id: user.id};

@@ -10,6 +10,7 @@
   "dependencies": {
     "cookie": "^0.4.1",
     "create-react-class": "^15.7.0",
+    "http-proxy-middleware": "^1.0.6",
     "js-cookie": "^2.2.1",
     "next": "9.4.0",
     "react": "16.13.1",

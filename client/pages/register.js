@@ -13,7 +13,7 @@ export default function Register(){
 
   function handleSubmit(event){
     event.preventDefault()
-    fetch('http://localhost:3030/register', {
+    fetch('server/register', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
